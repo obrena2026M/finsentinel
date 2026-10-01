@@ -38,7 +38,7 @@ jobs:
       LLM_GATEWAY: mock
       SESSION_SECRET: ci-secret-ci-secret-ci-secret-0123456789abcdef
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: actions/setup-node@v4
         with:
           node-version: 24
@@ -90,7 +90,7 @@ jobs:
     if: vars.CONTAINER_IMAGE == 'true'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - uses: docker/login-action@v3
         with:
           registry: ghcr.io
@@ -117,7 +117,7 @@ jobs:
       run:
         shell: powershell
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Deploy ${{ github.ref_name }} to staging
         run: |
           .\scripts\deploy.ps1 -Environment staging -Ref "${{ github.ref_name }}" `
@@ -143,7 +143,7 @@ jobs:
       run:
         shell: powershell
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
       - name: Deploy ${{ github.ref_name }} to production
         run: |
           .\scripts\deploy.ps1 -Environment production -Ref "${{ github.ref_name }}" `
