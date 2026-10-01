@@ -176,7 +176,7 @@
     <h2><span class="kind" id="p-kind" style="background: var(--ci)">Overview</span> <span id="p-title">How a change reaches production</span></h2>
     <div class="ids" id="p-ids">STAGE05 · documents/STAGE05_Deployment.md</div>
     <div id="p-body">
-      <p>Every push runs the same gate: lint, type-check, 101 non-browser tests with coverage thresholds, a golden-dataset AI evaluation on the mock gateway, Chromium end-to-end tests and the quality gate.</p>
+      <p>Every push runs the same gate: lint, type-check, 102 non-browser tests with coverage thresholds, a golden-dataset AI evaluation on the mock gateway, Chromium end-to-end tests and the quality gate.</p>
       <p>A version tag re-runs that gate, packages one immutable artefact (source + built web app + SBOM), deploys it to staging on a self-hosted Windows runner and smoke-tests it. A human approval on the GitHub <em>production</em> environment releases the production job, which backs up the database before switching releases and rolls back automatically if the smoke test fails.</p>
       <p>Select a step in the diagram to see what it does, which tool or person performs it, the risk a gate controls and the requirement IDs it satisfies.</p>
     </div>
@@ -205,7 +205,7 @@
     { id: 2, kind: 'ci', title: 'Lint + type-check', sub: 'biome check · tsc --noEmit', ids: 'DEP-02 · NFR-CI-01',
       what: 'GitHub Actions installs with npm ci (lockfile-exact) and runs Biome and the TypeScript compiler in type-check mode.',
       who: 'GitHub Actions, ubuntu-latest', cmd: 'npm ci && npx biome check . && npx tsc --noEmit' },
-    { id: 3, kind: 'ci', title: 'Tests + coverage', sub: '101 tests · c8 ≥ 95/80/95', ids: 'DEP-02 · QG-01…05 · AC-11',
+    { id: 3, kind: 'ci', title: 'Tests + coverage', sub: '102 tests · c8 ≥ 95/80/95', ids: 'DEP-02 · QG-01…05 · AC-11',
       what: 'Unit, integration, security and adversarial projects run under Playwright Test with c8 enforcing line/branch/function thresholds. Then the web app is built and the Chromium end-to-end suite runs in light and dark themes.',
       who: 'GitHub Actions', cmd: 'npx c8 playwright test && npm run build && npx playwright test -c playwright.e2e.config.ts' },
     { id: 4, kind: 'ai', title: 'AI eval + quality gate', sub: 'golden dataset · mock gateway', ids: 'DEP-02 · QG-06…14 · AC-12',
@@ -238,15 +238,15 @@
     { id: 12, kind: 'deploy', title: 'Deploy to production', sub: 'clone tag · npm ci · build · switch · start', ids: 'DEP-05 · DEP-07 · DEP-08 · DEP-14',
       what: 'Same script, production profile: NODE_ENV=production, demo seeding refused unless ALLOW_SEED=1, HOST/TRUST_PROXY/COOKIE_SECURE/CORS_ORIGIN from shared/.env, SESSION_SECRET generated on first deploy and never in source. The previous release directory is kept for rollback.',
       who: 'GitHub Actions job on the production host', cmd: '.\\scripts\\deploy.ps1 -Environment production -Ref v0.1.0' },
-    { id: 13, kind: 'rules', title: 'Migrate + smoke test', sub: 'idempotent migrations · /health/ready', ids: 'DEP-09 · NFR-REL-03',
-      what: 'Migrations run inside the application start (idempotent, transactional). The smoke test then proves the new release serves the SPA, reports ready and enforces authentication. A failure triggers the rollback lane automatically.',
-      who: 'Application start + scripts/smoke.ts', cmd: 'node scripts/smoke.ts --url=http://127.0.0.1:3000 --wait=90000' },
+    { id: 13, kind: 'rules', title: 'Migrate + smoke test', sub: 'migrations · build identity · /health/ready', ids: 'DEP-09 · NFR-REL-03',
+      what: 'Migrations run inside the application start (idempotent, transactional). The smoke test then proves that the responding server IS the new release (BUILD_SHA on /health/live matches the deployed commit), serves the SPA, reports ready and enforces authentication. A failure triggers the rollback lane automatically. Verification on the dev machine found that without the identity check a leftover server could pass the smoke test on behalf of a release that had crashed on start.',
+      who: 'Application start + scripts/smoke.ts', cmd: 'node scripts/smoke.ts --url=http://127.0.0.1:3000 --wait=90000 --expect-build=<sha>' },
     { id: 14, kind: 'prod', title: 'Go-live + hypercare', sub: 'checklist signed · hand-over to Stage 06', ids: 'DEP-13 · AC-15 · AC-16',
       what: 'The go-live checklist is signed: health endpoints green, backup verified, audit chain verified, roles walked through, logs flowing to shared/logs. Hypercare runs for the first sessions with the Ops dashboard open; monitoring and continuous improvement continue in Stage 06.',
       who: 'Operations + FCRM Admin', cmd: '.\\scripts\\deploy.ps1 -Environment production -Status' },
   ];
   const ROLLBACK = { ids: 'DEP-11 · NFR-REL-02',
-    title: 'Rollback lane', what: 'If the production smoke test fails, deploy.ps1 stops the app, restores the pre-deploy backup, points current back to the previous release, restarts and smoke-tests again, then exits non-zero so the GitHub job is red. The same path is available by hand with -Rollback [-RestoreDb]. Data written between the switch and the rollback (normally seconds) is lost by design; the audit chain stays consistent because the backup is a single transactional snapshot.',
+    title: 'Rollback lane', what: 'If the production smoke test fails, deploy.ps1 stops the app (task, process and port owner), restores the pre-deploy backup, points current back to the previous release, restarts and smoke-tests again, then exits non-zero so the GitHub job is red. Measured on the dev machine: 8 seconds. The same path is available by hand with -Rollback [-RestoreDb]. Data written between the switch and the rollback (normally seconds) is lost by design; the audit chain stays consistent because the backup is a single transactional snapshot.',
     who: 'scripts/deploy.ps1 (automatic) or operator', cmd: '.\\scripts\\deploy.ps1 -Environment production -Rollback -RestoreDb' };
 
   // --------------------------------------------------------------- layout

@@ -8,7 +8,7 @@
 | Date | 2026-10-01 |
 | Inputs | PRD NFR-OPS-01…08, NFR-CI-01…03, NFR-SEC-09/10, NFR-REL-02/03, AC-15/16; Architecture §13, §16; tools.md §2 (environment constraints); Stage 04 gaps ("CI still not executed on GitHub", "Linux/macOS deployment is Stage 05 work") |
 | Hosting | GitHub (public repository), GitHub Actions, self-hosted Windows runners for staging and production |
-| Result | Release pipeline (`.github/workflows/release.yml`) with two human gates; immutable-release Windows deployment (`scripts/deploy.ps1`) with backup, smoke test and automatic rollback, **verified end to end on the dev machine as staging**; production hardening in code with tests (101 non-browser tests pass); animated workflow page `STAGE05_Deployment_Workflow.html`; GitHub set-up requirements in §5 |
+| Result | Release pipeline (`.github/workflows/release.yml`) with two human gates; immutable-release Windows deployment (`scripts/deploy.ps1`) with backup, smoke test and automatic rollback, **verified end to end on the dev machine as staging** (three deploy runs, one manual rollback; two real defects found and fixed, §12); production hardening in code with tests (102 non-browser tests pass); animated workflow page `STAGE05_Deployment_Workflow.html`; GitHub set-up requirements in §5 |
 
 New requirement IDs introduced in this stage use the prefix **`DEP-`** (deployment steps, gates and safeguards). They are referenced in workflow comments, script headers, code comments and test names.
 
@@ -51,7 +51,7 @@ The animated version of this table is `documents/STAGE05_Deployment_Workflow.htm
 |---|---|---|---|---|---|
 | 1 | Push / pull request to `main` | developer, branch protection | — | DEP-01 | CI status check required; one approving review required |
 | 2 | Lint + type-check | `ci.yml` (`npm ci`, Biome, `tsc --noEmit`) | automated | DEP-02 | fails on style/type errors |
-| 3 | Tests + coverage, build, e2e | `ci.yml` (c8 + Playwright; Chromium light/dark) | automated | DEP-02, QG-01…05 | 101 non-browser tests, thresholds 95/80/95; 8 browser tests |
+| 3 | Tests + coverage, build, e2e | `ci.yml` (c8 + Playwright; Chromium light/dark) | automated | DEP-02, QG-01…05 | 102 non-browser tests, thresholds 95/80/95; 10 browser tests |
 | 4 | AI evaluation + quality gate | `ci.yml` (`evaluations/run.ts --gateway=mock`, `scripts/quality-gate.ts`) | automated | DEP-02, QG-06…14 | PASS/FAIL across software, AI and governance thresholds |
 | 5 | PR review and merge | reviewer | **human** | DEP-01, DEP-06 | nothing reaches `main` unreviewed |
 | 6 | Tag `vX.Y.Z` on `main` | release manager | — | DEP-03 | the deployment unit |
@@ -61,7 +61,7 @@ The animated version of this table is `documents/STAGE05_Deployment_Workflow.htm
 | 10 | Production approval | GitHub Environment `production`, required reviewers | **human** | DEP-06 | job waits until a named reviewer approves |
 | 11 | Back up database | `scripts/backup.ts` (VACUUM INTO) | safeguard | DEP-10 | recovery point for this deployment |
 | 12 | Deploy to production | `deploy-production` on `[self-hosted, windows, finsentinel-production]` | automated | DEP-05, DEP-07, DEP-08, DEP-14 | new release directory, `current` junction switched, task restarted |
-| 13 | Migrate + smoke test | app start (idempotent migrations) + `scripts/smoke.ts` | safeguard | DEP-09 | failure → automatic rollback (DEP-11) and red job |
+| 13 | Migrate + smoke test | app start (idempotent migrations) + `scripts/smoke.ts --expect-build=<sha>` | safeguard | DEP-09 | proves the *new* release answers (`BUILD_SHA` on `/health/live`); failure → automatic rollback (DEP-11) and red job |
 | 14 | Go-live + hypercare | operations + FCRM Admin | **human** | DEP-13 | checklist §11.3 signed; hand-over to Stage 06 |
 
 Workflow mechanics worth knowing:
@@ -181,9 +181,9 @@ Steps performed by one run of `deploy.ps1 -Environment <env> -Ref <tag>` (DEP-08
 3. **Configure**: create `shared\.env` on first deploy (profile per environment, §7), copy it into the release, and **validate it with the application's own schema** before anything is built (`loadEnv()`), so a bad configuration fails here and not after the switch.
 4. **Build**: `npm ci` and `npm run build`; refuses to continue without `web\dist\index.html`.
 5. **Backup** (DEP-10): `scripts/backup.ts` into `BACKUP_DIR`; the new file's path is the recovery point.
-6. **Switch**: stop the task and any `node.exe` started from this installation, re-point `current`, record `previous.txt`.
+6. **Switch**: stop the previous server three ways (the scheduled task, any `node.exe` whose command line names this installation, and whatever process owns the port), wait until the port is free and **refuse to continue if it is still held**; then re-point `current` and record `previous.txt`.
 7. **Start**: (re)register the Task Scheduler task `FinSentinel-<env>` (runs `scripts/service-run.ps1`, which starts `node --use-system-ca --env-file=.env src/server.ts` with stdout/stderr appended to `shared\logs`), trigger at logon, restart up to 3 times a minute apart, no execution time limit; then start it.
-8. **Smoke** (DEP-09): `scripts/smoke.ts` against `http://127.0.0.1:<port>` with a 90 s start-up allowance.
+8. **Smoke** (DEP-09): `scripts/smoke.ts --expect-build=<sha>` against `http://127.0.0.1:<port>` with a 90 s start-up allowance. `BUILD_SHA` is appended to the release copy of `.env` in step 3 and reported by `/health/live`, so a leftover process from the previous release cannot pass the smoke test on behalf of the new one.
 9. **Rollback on failure** (DEP-11): stop, restore the pre-deploy backup, switch `current` back, restart, smoke again, exit 1.
 10. **Housekeeping**: keep the newest three releases (never the current or previous one).
 
@@ -231,7 +231,8 @@ Secrets never live in the repository: `.env` is git-ignored, the installer and d
 | Bind address from `HOST`; start-up log shows host, port, gateway, auth mode and `NODE_ENV`. | `src/server.ts` | DEP-05, NFR-OPS-03 | e2e server start |
 | `TRUST_PROXY`, `COOKIE_SECURE`, `CORS_ORIGIN` wired into Fastify, session cookie and CORS. Local defaults unchanged. | `src/app.ts` | DEP-05, NFR-SEC-09 | `tests/security/rbac-routes.spec.ts` "production flags: Secure cookie and CORS allow-list" |
 | `BACKUP_DIR` for backup and restore; restore script with integrity check, dry run by default, pre-restore copy. | `scripts/backup.ts`, `scripts/restore.ts` | DEP-10, DEP-11, NFR-OPS-07 | exercised on the local database (§12) |
-| Smoke test script (8 checks). | `scripts/smoke.ts` | DEP-09, NFR-OPS-02 | exercised by the staging deploy (§12) |
+| Smoke test script (8 checks, 9 with `--expect-build`). Exit status via `process.exitCode`, requests with `Connection: close` (see §12, run 2). | `scripts/smoke.ts` | DEP-09, NFR-OPS-02 | exercised by the staging deploy (§12) |
+| Release identity: `BUILD_SHA` env (optional) reported by `/health/live`; written by the deploy script. | `src/config/env.ts`, `src/routes/system.ts`, `scripts/deploy.ps1` | DEP-09 | `tests/integration/services-and-routes.spec.ts` "health/live reports the release build identity"; unit env test |
 | `npm run start:prod` uses `--env-file-if-exists` so containers can run without a `.env` file. | `package.json` | DEP-05 | — |
 
 ---
@@ -240,7 +241,7 @@ Secrets never live in the repository: `.env` is git-ignored, the installer and d
 
 ### 9.1 Quality gate inputs (unchanged, re-run)
 
-`npm test`: **101 passed** (unit 55, integration 26, security 5, adversarial 8 after this stage's two new tests). `npx tsc --noEmit`: clean. `biome check .`: clean (two pre-existing CSS specificity warnings).
+`npm test`: **102 passed** (99 before this stage + strict env flags unit test + production flags security test + release identity integration test). `npm run test:e2e`: 10 passed (light + dark). `npx tsc --noEmit`: clean. `biome check .`: clean (two pre-existing CSS specificity warnings).
 
 ### 9.2 Workflow files
 
@@ -248,9 +249,12 @@ All four YAML files parse (`yaml` package): `ci.yml` (`push`, `pull_request`, `w
 
 ### 9.3 Smoke test checks (`scripts/smoke.ts`)
 
+Eight checks; nine when `--expect-build=<sha>` is given, which the deploy script always does.
+
 | Check | Pass condition |
 |---|---|
 | startup | `/health/live` answers 200 within `--wait` ms (default 60 s; deploy uses 90 s) |
+| identity | `/health/live` reports `build` equal to `--expect-build` (the release just deployed) |
 | readiness | `/health/ready` 200 with `ok: true` (db, active risk model, FTS index populated, LLM configured) |
 | web | `/` is 200 `text/html`; a deep link such as `/cases/RA-0000/x` falls back to the SPA |
 | auth | `/api/cases` without a session is 401; `/api/auth/users` lists ≥ 4 synthetic users |
@@ -316,11 +320,22 @@ The user chose a **demo go-live on the mock gateway**: no API key is needed, eve
 
 ## 12. Verification performed on the dev machine
 
-A full staging deployment was executed on the development machine acting as the staging host, cloning the committed `main` branch into a scratch install directory on port 3201. The run and its outcome are recorded in §12.1; the scheduled task and the scratch directory were removed afterwards so the machine is left as found.
+Staging deployments were executed on the development machine acting as the staging host, cloning the committed `main` branch into a scratch install directory (`...\finsentinel-staging`, port 3201, task `FinSentinel-staging`). Three runs were needed; each failure was a real defect that the pipeline would otherwise have carried to GitHub. Afterwards the scheduled task was unregistered, the server stopped and the scratch directory deleted, so the machine is left as found.
 
-### 12.1 Staging deploy run
+### 12.1 Runs
 
-See the table appended below (filled from the actual run log `test-results/deploy-staging-verify.log`).
+| Run | Ref | Outcome | Finding | Fix |
+|---|---|---|---|---|
+| 1 | `main @ 9dd7da8` | **failed** at step 3 | The configuration check imported the app's env schema before `npm ci`, so `zod` was missing. A local-path clone also warned that `--depth` is ignored. | Check moved after `npm ci`; shallow clone only for remote URLs; clean `FAILED:` output via `trap` |
+| 2 | `main @ 9dd7da8` | **failed** at step 7 (8/8 checks had passed) | (a) `smoke.ts` crashed on exit with a libuv assertion (`UV_HANDLE_CLOSING`, exit 0xC0000409) because `process.exit()` ran while keep-alive sockets were closing. (b) Investigating the next run showed the server from this run was still bound to the port: `Stop-ScheduledTask` kills only the launcher and the stop logic matched the install path in the command line, which the launcher did not pass. The following deploy's server died with `EADDRINUSE` while the smoke test passed against the old process. | `process.exitCode` + `Connection: close`; launcher passes absolute paths; stop logic adds port-owner detection and waits for a free port; `BUILD_SHA` written to the release `.env`, reported by `/health/live`, asserted by `smoke.ts --expect-build` |
+| 3 | `main @ 1726944` | **passed**: backup taken, old process (pid 17740) terminated by port owner, new release started, **9/9 checks** including `identity: expected 1726944, got 1726944`; `current` switched, `previous.txt` written | — | — |
+| rollback | `-Rollback` | **passed** in 8 s wall time: task stopped, process terminated, `current` re-pointed to the previous release, restarted, 8/8 checks | The pre-BUILD_SHA release reports `build: null`, as expected | — |
+
+`-Status` output after run 3: current and previous release paths, task `Running`, one node process, `/health/ready` 200 with all checks true. Start-up to `/health/live` took 19 s on the first start of a fresh database (migrations, reference seed, demo cases paced by `MOCK_LATENCY_MS`) and 3–4 s on later starts, within the 90 s allowance.
+
+### 12.2 What this changed in the design
+
+The smoke test now has to prove **which** release is answering, not only that something answers. That is the difference between "a deploy that works once" and a deployment that cannot silently keep the old code running.
 
 ---
 
@@ -352,6 +367,8 @@ See the table appended below (filled from the actual run log `test-results/deplo
 | Strict env flag parsing instead of documenting "use 1, not 0" | A deployment safeguard that depends on operators remembering a quirk is not a safeguard; the fix also removed a real bug |
 | `SESSION_SECRET` generated on the host, not stored in GitHub | The secret never needs to exist anywhere but the host; rotation is "delete the line and redeploy" |
 | Smoke test checks authorization and error shape, not only health | A release that is up but leaks stack traces or serves `/api/cases` anonymously must fail the deploy |
+| Smoke test asserts the release identity (`BUILD_SHA`) | Found in verification: a leftover server passed the smoke test on behalf of a release that had crashed with `EADDRINUSE`; a deploy must prove the new code answers |
+| Stop logic uses the port owner as the final authority | Task and command-line matching both failed once; the port is the one fact that cannot be wrong about which process serves traffic |
 
 ---
 
@@ -367,7 +384,7 @@ See the table appended below (filled from the actual run log `test-results/deplo
 | DEP-06 | Human gates: PR review, UAT, production approval | Human-in-the-loop criterion, AC-15 | §4, GitHub Environment `production` |
 | DEP-07 | No demo seeding in production without explicit opt-in; strict flags | NFR-SEC-10 | `src/config/env.ts`, unit test |
 | DEP-08 | Immutable release directories + Task Scheduler on the Windows host | NFR-OPS-01 | `scripts/deploy.ps1`, `scripts/service-run.ps1` |
-| DEP-09 | Smoke test after every deploy | NFR-OPS-02, NFR-OPS-08 | `scripts/smoke.ts` |
+| DEP-09 | Smoke test after every deploy, including release identity | NFR-OPS-02, NFR-OPS-08 | `scripts/smoke.ts`, `/health/live` `build` |
 | DEP-10 | Pre-deploy backup as recovery point | NFR-OPS-07 | `scripts/backup.ts`, `deploy.ps1` step 5 |
 | DEP-11 | Automatic and manual rollback; restore script | NFR-REL-02, NFR-OPS-07 | `deploy.ps1`, `scripts/restore.ts` |
 | DEP-12 | Dependabot, CodeQL, lockfile installs, SBOM | Production readiness criterion | `.github/dependabot.yml`, `codeql.yml` |

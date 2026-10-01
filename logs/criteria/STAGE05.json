@@ -2,17 +2,29 @@
   "stage": "05",
   "name": "Deployment",
   "date": "2026-10-01",
-  "ai_usage": "Claude Code read the stage definitions, the existing CI workflow, the architecture's deployment section, the installer and the environment constraints, then proposed a deployment plan with four decision points (target profile, GitHub plan, go-live gateway, first commit) for the user to review before building. After approval it implemented the Stage 05 package: production hardening in code (HOST, TRUST_PROXY, COOKIE_SECURE, CORS_ORIGIN, strict boolean env flags, a start-up guard against seeding demo data in production) with unit and security tests; a tag-triggered release workflow that reuses the CI workflow as its gate, packages a versioned zip + CycloneDX SBOM + GitHub Release, deploys to staging on a self-hosted Windows runner, waits for a human approval on the GitHub production environment and deploys to production; an immutable-release deploy script for Windows hosts (clone tag, npm ci, build, env validation, pre-deploy backup, junction switch, Task Scheduler start, smoke test, automatic rollback, status and manual rollback); smoke and restore scripts; a Dockerfile as the documented container profile; Dependabot and CodeQL; the STAGE05 deployment document with go-live path, GitHub requirements, gates with rationale and traceability; and a standalone animated HTML workflow page rendered and checked in Chromium. The deploy script was verified end to end on the dev machine acting as staging (first run failed because the configuration check ran before npm ci; fixed and re-run). Hardening uncovered a real defect: z.coerce.boolean treated \"0\" and \"false\" as true, so SEED_ON_START=0 would still have seeded demo cases. The repository was initialised on main with one commit so a release ref exists.",
+  "ai_usage": "Claude Code read the stage definitions, the existing CI workflow, the architecture's deployment section, the installer and the environment constraints, then proposed a deployment plan with four decision points (target profile, GitHub plan, go-live gateway, first commit) for the user to review before building. After approval it implemented the Stage 05 package: production hardening in code (HOST, TRUST_PROXY, COOKIE_SECURE, CORS_ORIGIN, strict boolean env flags, a start-up guard against seeding demo data in production) with unit and security tests; a tag-triggered release workflow that reuses the CI workflow as its gate, packages a versioned zip + CycloneDX SBOM + GitHub Release, deploys to staging on a self-hosted Windows runner, waits for a human approval on the GitHub production environment and deploys to production; an immutable-release deploy script for Windows hosts (clone tag, npm ci, build, env validation, pre-deploy backup, junction switch, Task Scheduler start, smoke test, automatic rollback, status and manual rollback); smoke and restore scripts; a Dockerfile as the documented container profile; Dependabot and CodeQL; the STAGE05 deployment document with go-live path, GitHub requirements, gates with rationale and traceability; and a standalone animated HTML workflow page rendered and checked in Chromium. The deploy script was verified end to end on the dev machine acting as staging over three runs plus a manual rollback. Run 1 failed because the configuration check ran before npm ci. Run 2 passed its checks but the smoke script crashed on exit (libuv assertion on Windows), and the investigation showed the old server process had survived the stop step, so the next release had died with EADDRINUSE while the smoke test passed against the old process. The fixes added port-owner detection to the stop logic, a BUILD_SHA release identity reported by /health/live and asserted by the smoke test, and process.exitCode instead of process.exit. Run 3 passed 9/9 with the identity check; rollback took 8 seconds. Hardening uncovered a real defect: z.coerce.boolean treated \"0\" and \"false\" as true, so SEED_ON_START=0 would still have seeded demo cases. The repository was initialised on main with one commit so a release ref exists.",
   "criteria": {
     "ai_harness": {
       "done": [
         "No LLM is used anywhere in the deployment path: the harness is deterministic scripts and GitHub Actions; the mock gateway's runtime dependency on tests/fixtures/llm was identified and shipped in the release package and the container image so a deployed mock-mode instance behaves exactly like CI",
-        "Gateway selection and the API key remain configuration (shared\\.env on the host, production environment secret in GitHub); the switch to the real model is a gated configuration change with a real-model evaluation run first (§11.4)"
+        "Gateway selection and the API key remain configuration (shared\\.env on the host, production environment secret in GitHub); the switch to the real model is a gated configuration change with a real-model evaluation run first (§11.4)",
+        "Harness unchanged by deployment: pipeline order, schemas, prompts and gateway interface are deployed as-is; the deploy script validates the LLM configuration before the switch and /health/ready reports the active gateway"
       ],
-      "evidence": ["documents/STAGE05_Deployment.md §1, §11.4", ".github/workflows/release.yml package job", "Dockerfile"],
-      "decisions": [{ "decision": "Ship mock fixtures in release artefacts", "reason": "The mock gateway is a first-class runtime mode for the demo go-live, not a test-only shim; a deployed instance must run the same fixtures CI validated" }],
-      "gaps": ["Real-model evaluation run still pending an API key"],
-      "self_score": 3
+      "evidence": [
+        "documents/STAGE05_Deployment.md §1, §11.4",
+        ".github/workflows/release.yml package job",
+        "Dockerfile"
+      ],
+      "decisions": [
+        {
+          "decision": "Ship mock fixtures in release artefacts",
+          "reason": "The mock gateway is a first-class runtime mode for the demo go-live, not a test-only shim; a deployed instance must run the same fixtures CI validated"
+        }
+      ],
+      "gaps": [
+        "Real-model evaluation run still pending an API key"
+      ],
+      "self_score": 4
     },
     "sdlc_automation": {
       "done": [
@@ -24,13 +36,31 @@
         "Repository initialised on main with one commit; GitHub set-up (branch protection, environments, variables, runner labels) documented step by step",
         "Animated workflow HTML generated from a data array of steps, checked in Chromium in light and dark with no console errors"
       ],
-      "evidence": [".github/workflows/release.yml", ".github/workflows/ci.yml", ".github/dependabot.yml", ".github/workflows/codeql.yml", "documents/STAGE05_Deployment.md §3, §5", "documents/STAGE05_Deployment_Workflow.html"],
-      "decisions": [
-        { "decision": "Git tag is the deployment unit; staging and production deploy the same tag in one run", "reason": "Byte-identical code in both environments; production cannot run something staging did not" },
-        { "decision": "Reuse ci.yml via workflow_call instead of copying steps", "reason": "A tag must never pass a weaker gate than a push; one definition cannot drift" },
-        { "decision": "Self-hosted Windows runner as the implemented profile, container as documented profile B", "reason": "The only environment available has no Docker and no cloud account; the Windows path is verifiable end to end on the dev machine" }
+      "evidence": [
+        ".github/workflows/release.yml",
+        ".github/workflows/ci.yml",
+        ".github/dependabot.yml",
+        ".github/workflows/codeql.yml",
+        "documents/STAGE05_Deployment.md §3, §5",
+        "documents/STAGE05_Deployment_Workflow.html"
       ],
-      "gaps": ["Workflows are YAML-validated but have not executed on GitHub yet (no remote); first push is the first go-live step"],
+      "decisions": [
+        {
+          "decision": "Git tag is the deployment unit; staging and production deploy the same tag in one run",
+          "reason": "Byte-identical code in both environments; production cannot run something staging did not"
+        },
+        {
+          "decision": "Reuse ci.yml via workflow_call instead of copying steps",
+          "reason": "A tag must never pass a weaker gate than a push; one definition cannot drift"
+        },
+        {
+          "decision": "Self-hosted Windows runner as the implemented profile, container as documented profile B",
+          "reason": "The only environment available has no Docker and no cloud account; the Windows path is verifiable end to end on the dev machine"
+        }
+      ],
+      "gaps": [
+        "Workflows are YAML-validated but have not executed on GitHub yet (no remote); first push is the first go-live step"
+      ],
       "self_score": 4
     },
     "human_in_loop": {
@@ -39,23 +69,47 @@
         "Automated safeguards (backup, smoke, rollback) deliberately kept out of human hands so they run every time",
         "Production demo seeding requires an explicit operator opt-in (ALLOW_SEED) and is refused otherwise at start-up"
       ],
-      "evidence": ["documents/STAGE05_Deployment.md §4, §11.3", ".github/workflows/release.yml deploy-production environment", "src/config/env.ts", "tests/unit/foundations.spec.ts"],
-      "decisions": [
-        { "decision": "Production approval as a GitHub Environment required reviewer rather than a custom step", "reason": "Native audit trail of who approved what and when, release notes and staging result visible at the point of decision, no code to maintain" },
-        { "decision": "Approval sits between staging and production, not before staging", "reason": "Staging is reversible and automated; production is the last reversible moment before live data changes, so that is where the human belongs" }
+      "evidence": [
+        "documents/STAGE05_Deployment.md §4, §11.3",
+        ".github/workflows/release.yml deploy-production environment",
+        "src/config/env.ts",
+        "tests/unit/foundations.spec.ts"
       ],
-      "gaps": ["Required reviewers must be configured by the repository owner after the first push"],
+      "decisions": [
+        {
+          "decision": "Production approval as a GitHub Environment required reviewer rather than a custom step",
+          "reason": "Native audit trail of who approved what and when, release notes and staging result visible at the point of decision, no code to maintain"
+        },
+        {
+          "decision": "Approval sits between staging and production, not before staging",
+          "reason": "Staging is reversible and automated; production is the last reversible moment before live data changes, so that is where the human belongs"
+        }
+      ],
+      "gaps": [
+        "Required reviewers must be configured by the repository owner after the first push"
+      ],
       "self_score": 5
     },
     "evaluation": {
       "done": [
-        "Post-deploy smoke test with eight checks covering readiness (db, risk model, FTS index, LLM config), SPA serving, authentication on protected routes, 404 shape without stack traces and RBAC on metrics",
+        "Post-deploy smoke test with eight checks covering readiness (db, risk model, FTS index, LLM config), SPA serving, authentication on protected routes, 404 shape without stack traces and RBAC on metrics, plus a ninth release-identity check (BUILD_SHA on /health/live) that the deploy script always requests",
         "A failed smoke test is a deploy failure that triggers rollback and a red GitHub job",
         "The real-model switch is defined as an evaluation gate: run the golden dataset on staging with the real model, then tighten unsupportedClaimRate and groundingSupportedRate as the gate file already notes"
       ],
-      "evidence": ["scripts/smoke.ts", "scripts/deploy.ps1 smoke/rollback steps", "documents/STAGE05_Deployment.md §9.3, §11.4"],
-      "decisions": [{ "decision": "Smoke test checks authorization and error shape, not only health endpoints", "reason": "A release that is up but serves /api/cases anonymously or leaks stack traces must fail the deploy, not pass it" }],
-      "gaps": ["No synthetic load test in the pipeline"],
+      "evidence": [
+        "scripts/smoke.ts",
+        "scripts/deploy.ps1 smoke/rollback steps",
+        "documents/STAGE05_Deployment.md §9.3, §11.4"
+      ],
+      "decisions": [
+        {
+          "decision": "Smoke test checks authorization and error shape, not only health endpoints",
+          "reason": "A release that is up but serves /api/cases anonymously or leaks stack traces must fail the deploy, not pass it"
+        }
+      ],
+      "gaps": [
+        "No synthetic load test in the pipeline"
+      ],
       "self_score": 4
     },
     "context_engineering": {
@@ -64,26 +118,65 @@
         "Environment constraints from tools.md (no Docker, corporate TLS proxy, Node 24 only) were carried into the deploy script (NODE_USE_SYSTEM_CA, --use-system-ca for the server, no native dependencies)",
         "Stage 04 gaps (CI never run on GitHub, Windows-only installer) were picked up as explicit Stage 05 inputs"
       ],
-      "evidence": ["documents/STAGE05_Deployment.md header, §15", "scripts/deploy.ps1 preflight", "scripts/service-run.ps1"],
-      "decisions": [{ "decision": "Introduce a DEP- ID prefix instead of overloading AD-", "reason": "Deployment steps and gates are operational controls, not architecture decisions; a distinct prefix keeps the traceability table readable for the panel" }],
+      "evidence": [
+        "documents/STAGE05_Deployment.md header, §15",
+        "scripts/deploy.ps1 preflight",
+        "scripts/service-run.ps1"
+      ],
+      "decisions": [
+        {
+          "decision": "Introduce a DEP- ID prefix instead of overloading AD-",
+          "reason": "Deployment steps and gates are operational controls, not architecture decisions; a distinct prefix keeps the traceability table readable for the panel"
+        }
+      ],
       "gaps": [],
       "self_score": 4
     },
     "production_readiness": {
       "done": [
-        "Hardening: HOST binding, TRUST_PROXY, COOKIE_SECURE (verified to issue the Secure cookie only over forwarded HTTPS), CORS_ORIGIN allow-list, NODE_ENV-aware logging, strict boolean env flags, production seed guard; two new tests, 101 non-browser tests green",
+        "Hardening: HOST binding, TRUST_PROXY, COOKIE_SECURE (verified to issue the Secure cookie only over forwarded HTTPS), CORS_ORIGIN allow-list, NODE_ENV-aware logging, strict boolean env flags, production seed guard, BUILD_SHA release identity on /health/live; three new tests, 102 non-browser tests and 8 e2e tests green",
+        "Verification on the dev machine (three deploy runs + rollback) found and fixed two defects before GitHub ever ran the pipeline: configuration check before npm ci, and an orphaned server passing the smoke test for a release that had crashed with EADDRINUSE",
         "Immutable release directories with a junction switch, pre-deploy VACUUM INTO backup, Task Scheduler service with restart policy and file logs, 90 s start-up allowance, automatic rollback to previous release + backup, manual -Rollback and -Status",
         "Restore script with integrity check, dry run by default and a pre-restore copy; BACKUP_DIR for shared data layout",
         "Dockerfile: two-stage node:24-slim, non-root, /data volume, HEALTHCHECK on /health/ready, runs without .env",
         "Risks and limitations recorded: Task Scheduler logon trigger, no in-process TLS, SQLite single writer, simulation auth"
       ],
-      "evidence": ["src/config/env.ts", "src/app.ts", "src/server.ts", "tests/security/rbac-routes.spec.ts", "scripts/deploy.ps1", "scripts/restore.ts", "Dockerfile", "documents/STAGE05_Deployment.md §6, §10, §13", "test-results/deploy-staging-verify.log"],
-      "decisions": [
-        { "decision": "Backup before switch, smoke after start, automatic rollback in the same script", "reason": "The run that might need a recovery point is the run that creates it; a failed deploy becomes a non-event" },
-        { "decision": "Task Scheduler instead of a service wrapper", "reason": "Built in, no native dependency, no admin rights needed on the hackathon host; the logon-trigger limitation is documented with the fix" },
-        { "decision": "Validate shared\\.env with the application's own zod schema during deploy", "reason": "A bad configuration must fail before the switch, not after; the first verification run proved the ordering matters (check moved after npm ci)" }
+      "evidence": [
+        "src/config/env.ts",
+        "src/app.ts",
+        "src/server.ts",
+        "src/routes/system.ts",
+        "tests/security/rbac-routes.spec.ts",
+        "tests/integration/services-and-routes.spec.ts",
+        "scripts/deploy.ps1",
+        "scripts/service-run.ps1",
+        "scripts/smoke.ts",
+        "scripts/restore.ts",
+        "Dockerfile",
+        "documents/STAGE05_Deployment.md §6, §10, §12, §13"
       ],
-      "gaps": ["Container image not built locally (no Docker); first GitHub run verifies it", "HTTPS termination is delegated to a reverse proxy"],
+      "decisions": [
+        {
+          "decision": "Backup before switch, smoke after start, automatic rollback in the same script",
+          "reason": "The run that might need a recovery point is the run that creates it; a failed deploy becomes a non-event"
+        },
+        {
+          "decision": "Task Scheduler instead of a service wrapper",
+          "reason": "Built in, no native dependency, no admin rights needed on the hackathon host; the logon-trigger limitation is documented with the fix"
+        },
+        {
+          "decision": "Validate shared\\.env with the application's own zod schema during deploy",
+          "reason": "A bad configuration must fail before the switch, not after; the first verification run proved the ordering matters (check moved after npm ci)"
+        },
+        {
+          "decision": "Smoke test asserts the release identity (BUILD_SHA) and the stop logic treats the port owner as the final authority",
+          "reason": "Run 2 showed a leftover server passing the smoke test for a release that had crashed; a deployment must prove the new code answers, and the port is the one fact that cannot be wrong about which process serves traffic"
+        }
+      ],
+      "gaps": [
+        "Container image not built locally (no Docker); first GitHub run verifies it",
+        "HTTPS termination is delegated to a reverse proxy"
+      ],
       "self_score": 4
     },
     "token_efficiency": {
@@ -92,9 +185,18 @@
         "Deploy script, workflow and document were written once each; verification used the real script run rather than iterative prose",
         "No sub-agents used"
       ],
-      "evidence": ["logs/token_log.md task 24"],
-      "decisions": [{ "decision": "Verify the deploy with one real staging run instead of mocking it", "reason": "The run cost minutes of wall time but no model tokens, and it found a real ordering bug" }],
-      "gaps": ["Application-side real-model token measurement still pending"],
+      "evidence": [
+        "logs/token_log.md task 24"
+      ],
+      "decisions": [
+        {
+          "decision": "Verify the deploy with one real staging run instead of mocking it",
+          "reason": "The run cost minutes of wall time but no model tokens, and it found a real ordering bug"
+        }
+      ],
+      "gaps": [
+        "Application-side real-model token measurement still pending"
+      ],
       "self_score": 4
     },
     "engineering_judgement": {
@@ -102,16 +204,35 @@
         "Deployment is entirely deterministic: scripts, Task Scheduler, SQLite backup; no LLM in the path and no agent loop deciding what to deploy",
         "Strict env-flag parsing replaced z.coerce.boolean after finding that \"0\" parsed as true: a safeguard that depends on operators remembering a quirk is not a safeguard",
         "Secure cookie behaviour tested the way production will see it (forwarded HTTPS with proxy trust) rather than forcing the flag over plain HTTP",
-        "Deploy jobs skipped, not queued, when runners are absent"
+        "Deploy jobs skipped, not queued, when runners are absent",
+        "Verification by running the real deploy three times rather than reasoning about it; each failure became a code fix and a documented decision"
       ],
-      "evidence": ["src/config/env.ts envFlag", "tests/security/rbac-routes.spec.ts production flags test", ".github/workflows/release.yml if: vars.DEPLOY_ENABLED"],
+      "evidence": [
+        "src/config/env.ts envFlag",
+        "tests/security/rbac-routes.spec.ts production flags test",
+        ".github/workflows/release.yml if: vars.DEPLOY_ENABLED"
+      ],
       "decisions": [
-        { "decision": "SESSION_SECRET generated on the host rather than stored in GitHub", "reason": "The secret never needs to exist anywhere but the host; rotation is deleting one line and redeploying" },
-        { "decision": "Mock gateway at go-live (user decision), real model behind an evaluation gate", "reason": "Deterministic demo behaviour now; model quality thresholds are recalibrated with data before they guard production" }
+        {
+          "decision": "SESSION_SECRET generated on the host rather than stored in GitHub",
+          "reason": "The secret never needs to exist anywhere but the host; rotation is deleting one line and redeploying"
+        },
+        {
+          "decision": "Mock gateway at go-live (user decision), real model behind an evaluation gate",
+          "reason": "Deterministic demo behaviour now; model quality thresholds are recalibrated with data before they guard production"
+        }
       ],
       "gaps": [],
       "self_score": 5
     }
   },
-  "tokens": { "task_ids": [24], "output": 0, "cache_read": 0, "cache_write": 0, "subagents": 0 }
+  "tokens": {
+    "task_ids": [
+      24
+    ],
+    "output": 273796,
+    "cache_read": 20100273,
+    "cache_write": 573452,
+    "subagents": 0
+  }
 }

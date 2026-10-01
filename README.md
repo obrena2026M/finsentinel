@@ -29,7 +29,7 @@ Sign in by choosing a role tile (simulation mode, no password): **Pat Owner** (P
 ## Verify
 
 ```powershell
-npm test            # 52 tests: unit, integration, security, adversarial (Playwright, no browser)
+npm test            # 102 tests: unit, integration, security, adversarial (Playwright, no browser)
 npm run eval        # golden-dataset evaluation → evaluations/results/<timestamp>.json
 npm run gate        # release gate: software + AI + governance gates → PASS/FAIL
 npm run test:e2e    # Chromium walkthrough in light and dark themes (npx playwright install chromium first)
@@ -43,7 +43,7 @@ A Git tag `v*` runs `.github/workflows/release.yml`: the CI gate again → versi
 .\scripts\deploy.ps1 -Environment staging -Ref v0.1.0          # clone tag → npm ci → build → backup → switch → start (Task Scheduler) → smoke
 .\scripts\deploy.ps1 -Environment production -Status           # current release, task state, /health/ready
 .\scripts\deploy.ps1 -Environment production -Rollback -RestoreDb
-npm run smoke -- --url=http://127.0.0.1:3000                    # 8 post-deploy checks
+npm run smoke -- --url=http://127.0.0.1:3000 --expect-build=<sha>   # post-deploy checks incl. release identity
 npm run backup ; npm run restore -- --latest                   # VACUUM INTO backup; restore dry run (add --yes to apply)
 ```
 
