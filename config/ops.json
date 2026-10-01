@@ -1,0 +1,56 @@
+{
+  "_comment": "STAGE06 operating thresholds (OPS-02..OPS-04). 'critical' findings fail the heartbeat and open/update a GitHub issue; 'warning' findings are reported only. Regression tolerances apply to scripts/eval-compare.ts (NFR-MNT-02).",
+  "slo": {
+    "availability_business_hours": 0.99,
+    "api_p95_ms": 500,
+    "api_error_rate": 0.01,
+    "pipeline_success_rate": 0.95,
+    "time_to_decision_hours_p50": 72,
+    "unsupported_claims_open_max": 10
+  },
+  "heartbeat": {
+    "http_timeout_ms": 5000,
+    "backup_max_age_hours": { "warning": 26, "critical": 48 },
+    "disk_free_gb": { "warning": 5, "critical": 1 },
+    "db_size_gb": { "warning": 2, "critical": 5 },
+    "api_p95_ms": { "warning": 500, "critical": 2000 },
+    "error_rate_24h": { "warning": 0.01, "critical": 0.05 },
+    "pipeline_step_failures_24h": { "warning": 1, "critical": 5 },
+    "llm_failures_24h": { "warning": 1, "critical": 5 },
+    "unsupported_claims_open": { "warning": 10, "critical": 25 },
+    "awaiting_committee": { "warning": 10, "critical": 25 }
+  },
+  "regression": {
+    "higher_is_better": [
+      "extractionAccuracy",
+      "missingInfoRecall",
+      "contradictionRecall",
+      "scopingF1",
+      "retrievalPrecision",
+      "retrievalRecall",
+      "groundingSupportedRate",
+      "bandAgreement",
+      "adversarialPassRate",
+      "pipelineSuccessRate"
+    ],
+    "lower_is_better": ["hallucinatedFacts", "inventedMissingValues", "unsupportedClaimRate"],
+    "tolerance": {
+      "default": 0.02,
+      "scopingF1": 0.05,
+      "retrievalPrecision": 0.05,
+      "retrievalRecall": 0.05,
+      "adversarialPassRate": 0,
+      "hallucinatedFacts": 0,
+      "inventedMissingValues": 0
+    },
+    "tokens_per_case_increase_pct": 20,
+    "cost_per_case_increase_pct": 20
+  },
+  "retention": {
+    "backups_days": 14,
+    "heartbeat_log_days": 30,
+    "request_metrics_days": 30,
+    "metrics_snapshots_days": 365,
+    "server_logs_days": 30
+  }
+}

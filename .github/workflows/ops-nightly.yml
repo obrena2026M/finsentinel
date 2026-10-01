@@ -1,0 +1,93 @@
+# STAGE06 operations (OPS-03, OPS-04). Every night: run the golden-dataset evaluation on the mock
+# gateway, compare it with the committed baseline (NFR-MNT-02), run the quality gate, and keep one
+# GitHub issue labelled "ops" open while a regression exists. On the production runner (when deploy is
+# enabled) the heartbeat runs against the live instance with the same issue mechanism.
+name: ops-nightly
+
+on:
+  schedule:
+    - cron: '0 3 * * *'
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  issues: write
+
+concurrency:
+  group: ops-nightly
+  cancel-in-progress: false
+
+jobs:
+  evaluation:
+    runs-on: ubuntu-latest
+    env:
+      LLM_GATEWAY: mock
+      SESSION_SECRET: ci-secret-ci-secret-ci-secret-0123456789abcdef
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Golden-dataset evaluation (mock gateway)
+        run: node evaluations/run.ts --gateway=mock
+      - name: Compare with baseline (NFR-MNT-02)
+        id: compare
+        continue-on-error: true
+        run: node scripts/eval-compare.ts --out=compare.md
+      - name: Quality gate
+        id: gate
+        continue-on-error: true
+        run: node scripts/quality-gate.ts > gate.txt 2>&1; code=$?; cat gate.txt; exit $code
+      - name: Summary
+        run: |
+          { echo "## Nightly evaluation"; cat compare.md; echo; echo '```'; cat gate.txt; echo '```'; } >> "$GITHUB_STEP_SUMMARY"
+          { cat compare.md; echo; echo 'Quality gate output:'; echo '```'; cat gate.txt; echo '```'; } > issue-body.md
+      - name: Alert (GitHub issue) on regression or gate failure
+        if: steps.compare.outcome == 'failure' || steps.gate.outcome == 'failure'
+        run: node scripts/ops-issue.ts --title="Nightly evaluation regression" --state=fail --body-file=issue-body.md
+      - name: Recover (close issue) when green
+        if: steps.compare.outcome == 'success' && steps.gate.outcome == 'success'
+        run: node scripts/ops-issue.ts --title="Nightly evaluation regression" --state=ok
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: nightly-${{ github.run_number }}
+          path: |
+            evaluations/results/*.json
+            compare.md
+            gate.txt
+      - name: Fail the job if a regression or gate failure was found
+        if: steps.compare.outcome == 'failure' || steps.gate.outcome == 'failure'
+        run: exit 1
+
+  heartbeat-production:
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: [self-hosted, windows, finsentinel-production]
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - name: Heartbeat against the live instance
+        id: hb
+        continue-on-error: true
+        run: |
+          Set-Location "${{ vars.PRODUCTION_INSTALL_DIR || 'C:\finsentinel\production' }}\current"
+          node --env-file=.env scripts\heartbeat.ts --url=http://127.0.0.1:${{ vars.PRODUCTION_PORT || 3000 }} --json | Tee-Object -FilePath "$env:GITHUB_WORKSPACE\heartbeat.json"
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: scripts/ops-issue.ts
+      - name: Alert on critical findings
+        if: steps.hb.outcome == 'failure'
+        run: node scripts\ops-issue.ts --title="Production heartbeat critical" --state=fail --body-file=heartbeat.json
+      - name: Recover when healthy
+        if: steps.hb.outcome == 'success'
+        run: node scripts\ops-issue.ts --title="Production heartbeat critical" --state=ok
+      - name: Fail the job if the heartbeat was critical
+        if: steps.hb.outcome == 'failure'
+        run: exit 1

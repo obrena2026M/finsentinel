@@ -1,0 +1,47 @@
+{
+  "_comment": "STAGE06 OPS-03: human-approved evaluation baseline for the current prompt/model/risk-model versions. scripts/eval-compare.ts compares every nightly run against it. Update only through a pull request after a deliberate change (new prompt version, model, risk model) and a reviewed run.",
+  "source_result": "2026-09-28T17-59-08-184Z.json",
+  "generated_at": "2026-09-28T17:59:08.183Z",
+  "gateway": "mock",
+  "mode": "optimized",
+  "versions": {
+    "prompts": {
+      "assessment": "v1",
+      "extraction": "v1",
+      "scoping": "v1",
+      "contradiction": "v1",
+      "grounding": "v1"
+    },
+    "risk_model": "1.0",
+    "llm_config": "config/llm.json"
+  },
+  "summary": {
+    "cases": 3,
+    "extractionAccuracy": 1,
+    "hallucinatedFacts": 0,
+    "missingInfoRecall": 1,
+    "inventedMissingValues": 0,
+    "contradictionRecall": 1,
+    "scopingF1": 0.8586,
+    "retrievalPrecision": 0.8163,
+    "retrievalRecall": 0.7719,
+    "groundingSupportedRate": 0.8947,
+    "unsupportedClaimRate": 0.1053,
+    "bandAgreement": 1,
+    "adversarialPassRate": 1,
+    "pipelineSuccessRate": 1
+  },
+  "tokens": {
+    "input": 8308,
+    "output": 6784,
+    "cacheRead": 12463,
+    "cacheWrite": 0,
+    "cost_usd": 0.1112,
+    "per_case": {
+      "input": 2769,
+      "output": 2261,
+      "cacheRead": 4154,
+      "cost_usd": 0.0371
+    }
+  }
+}

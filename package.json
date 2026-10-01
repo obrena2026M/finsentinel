@@ -35,7 +35,10 @@
     "start:prod": "node --env-file-if-exists=.env src/server.ts",
     "smoke": "node scripts/smoke.ts",
     "restore": "node --env-file=.env scripts/restore.ts",
-    "sbom": "npm sbom --sbom-format cyclonedx --omit dev"
+    "sbom": "npm sbom --sbom-format cyclonedx --omit dev",
+    "heartbeat": "node --env-file=.env scripts/heartbeat.ts",
+    "eval:compare": "node scripts/eval-compare.ts",
+    "feedback:export": "node --env-file=.env scripts/feedback-export.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.128.0",
