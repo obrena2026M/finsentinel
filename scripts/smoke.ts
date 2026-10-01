@@ -3,6 +3,10 @@ import { loadEnv } from '../src/config/env.ts';
 // DEP-09 post-deployment smoke test (NFR-OPS-02, AC-15).
 // node scripts/smoke.ts [--url=http://127.0.0.1:3000] [--wait=60000] [--expect-web=1]
 // Exit 0 when every check passes; 1 otherwise. Prints one line per check.
+//
+// Exit is signalled through process.exitCode, never process.exit(): on Windows, exiting while
+// undici keep-alive sockets are still closing trips a libuv assertion (UV_HANDLE_CLOSING) and the
+// process dies with 0xC0000409 even though every check passed. Requests also send Connection: close.
 
 function arg(name: string, fallback: string): string {
   const a = process.argv.find((x) => x.startsWith(`--${name}=`));
@@ -30,11 +34,15 @@ const record = (name: string, ok: boolean, detail: string) => {
   console.log(`${ok ? 'PASS' : 'FAIL'}  ${name.padEnd(40)} ${detail}`);
 };
 
-async function get(path: string, init: RequestInit = {}) {
+async function get(path: string) {
   const ctl = new AbortController();
   const t = setTimeout(() => ctl.abort(), 10_000);
   try {
-    return await fetch(`${base}${path}`, { ...init, signal: ctl.signal, redirect: 'manual' });
+    return await fetch(`${base}${path}`, {
+      signal: ctl.signal,
+      redirect: 'manual',
+      headers: { connection: 'close' },
+    });
   } finally {
     clearTimeout(t);
   }
@@ -60,15 +68,15 @@ async function waitForLive(): Promise<boolean> {
   return false;
 }
 
-function finish(): never {
+function finish(): void {
   const failed = checks.filter((c) => !c.ok);
   console.log(`\n${checks.length - failed.length}/${checks.length} checks passed`);
-  process.exit(failed.length ? 1 : 0);
+  process.exitCode = failed.length ? 1 : 0;
 }
 
 async function main() {
   console.log(`FinSentinel smoke test against ${base}`);
-  if (!(await waitForLive())) finish();
+  if (!(await waitForLive())) return finish();
 
   const ready = await get('/health/ready');
   const body = (await ready.json().catch(() => ({}))) as { ok?: boolean; checks?: Record<string, unknown> };
@@ -118,5 +126,5 @@ async function main() {
 
 main().catch((e) => {
   console.error(e);
-  process.exit(1);
+  process.exitCode = 1;
 });

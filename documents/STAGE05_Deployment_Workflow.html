@@ -225,7 +225,7 @@
     { id: 8, kind: 'deploy', title: 'Deploy to staging', sub: 'self-hosted Windows runner', ids: 'DEP-04 · DEP-08',
       what: 'The staging job runs scripts/deploy.ps1 on the runner labelled finsentinel-staging: clone the tag into releases/<tag>-<ts>, npm ci, build, copy shared/.env, back up the database, switch the current junction, start the Task Scheduler task. Staging uses the production profile (NODE_ENV=production) with demo seeding opted in.',
       who: 'GitHub Actions job on the staging host', cmd: '.\\scripts\\deploy.ps1 -Environment staging -Ref v0.1.0' },
-    { id: 9, kind: 'rules', title: 'Smoke test + UAT', sub: '9 HTTP checks · role walkthrough', ids: 'DEP-09 · NFR-OPS-02',
+    { id: 9, kind: 'rules', title: 'Smoke test + UAT', sub: '8 HTTP checks · role walkthrough', ids: 'DEP-09 · NFR-OPS-02',
       what: 'scripts/smoke.ts waits for /health/live, requires /health/ready to report db, risk model, retrieval index and LLM configuration OK, checks the SPA, the 401 on protected routes, the synthetic user picker and that 404s carry no stack trace. UAT then follows the user manual journey per role.',
       who: 'Deterministic script, then the FCRM Analyst and Risk Committee users', cmd: 'node scripts/smoke.ts --url=http://127.0.0.1:3001' },
     { id: 10, kind: 'human', title: 'Production approval', sub: 'GitHub Environment · required reviewers', ids: 'DEP-06 · AC-15',

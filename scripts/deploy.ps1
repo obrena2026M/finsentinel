@@ -49,6 +49,7 @@ param(
 )
 
 $ErrorActionPreference = 'Stop'
+trap { Write-Host ""; Write-Host ("FAILED: {0}" -f $_.Exception.Message) -ForegroundColor Red; exit 1 }
 $script:StepNo = 0
 function Write-Step([string]$Text) { $script:StepNo++; Write-Host ""; Write-Host ("[{0}] {1}" -f $script:StepNo, $Text) -ForegroundColor Cyan }
 function Write-Ok([string]$Text)   { Write-Host ("    OK   {0}" -f $Text) -ForegroundColor Green }
@@ -214,7 +215,10 @@ Write-Step "Fetching release $Ref"
 $stamp = Get-Date -Format 'yyyyMMdd-HHmmss'
 $safeRef = ($Ref -replace '[^A-Za-z0-9._-]', '_')
 $ReleaseDir = Join-Path $ReleasesDir ("{0}-{1}" -f $safeRef, $stamp)
-Invoke-Native 'git clone' $gitExe @('clone', '--quiet', '--depth', '1', '--branch', $Ref, $Repo, $ReleaseDir) $InstallDir
+$cloneArgs = @('clone', '--quiet')
+if (-not (Test-Path $Repo)) { $cloneArgs += @('--depth', '1') }   # local clones ignore --depth and warn
+$cloneArgs += @('--branch', $Ref, $Repo, $ReleaseDir)
+Invoke-Native 'git clone' $gitExe $cloneArgs $InstallDir
 $sha = (& $gitExe -C $ReleaseDir rev-parse --short HEAD).Trim()
 Write-Ok ("{0} @ {1} -> {2}" -f $Ref, $sha, $ReleaseDir)
 
@@ -251,11 +255,12 @@ if (-not (Test-Path $SharedEnv)) {
     Write-Ok "shared\.env exists; left untouched"
 }
 Copy-Item $SharedEnv (Join-Path $ReleaseDir '.env') -Force
-# The app validates the configuration itself; fail here rather than after the switch.
-Invoke-Native 'env check' $nodeExe @('--env-file=.env', '-e', "import('./src/config/env.ts').then(m=>{const e=m.loadEnv();console.log('    ..   env ok: NODE_ENV='+e.NODE_ENV+' gateway='+e.LLM_GATEWAY+' seed='+e.SEED_ON_START+' port='+e.PORT)})") $ReleaseDir
+Write-Ok "shared\.env copied into the release"
 
 Write-Step "Installing dependencies and building the web app"
 Invoke-Native 'npm ci' $npmCmd @('ci', '--no-fund', '--no-audit', '--silent') $ReleaseDir
+# The app validates the configuration itself (zod schema); fail here rather than after the switch.
+Invoke-Native 'env check' $nodeExe @('--env-file=.env', '-e', "import('./src/config/env.ts').then(m=>{const e=m.loadEnv();console.log('    ..   env ok: NODE_ENV='+e.NODE_ENV+' gateway='+e.LLM_GATEWAY+' seed='+e.SEED_ON_START+' port='+e.PORT)})") $ReleaseDir
 Invoke-Native 'npm run build' $npmCmd @('run', 'build', '--silent') $ReleaseDir
 if (-not (Test-Path (Join-Path $ReleaseDir 'web\dist\index.html'))) { Fail "web/dist/index.html not produced" }
 Write-Ok "release built"
