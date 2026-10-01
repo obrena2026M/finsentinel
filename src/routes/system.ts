@@ -11,7 +11,12 @@ import { evaluateGates, recentQualityRuns } from '../services/quality.ts';
 export async function systemRoutes(app: FastifyInstance, ctx: AppContext) {
   const auth = (a: Parameters<typeof authorize>[1]) => ({ preHandler: authorize(ctx, a) });
 
-  app.get('/health/live', async () => ({ ok: true, service: 'finsentinel', time: new Date().toISOString() }));
+  app.get('/health/live', async () => ({
+    ok: true,
+    service: 'finsentinel',
+    build: ctx.env.BUILD_SHA ?? null,
+    time: new Date().toISOString(),
+  }));
   app.get('/health/ready', async (_request, reply) => {
     const checks: Record<string, boolean | string> = {};
     try {

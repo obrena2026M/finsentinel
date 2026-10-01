@@ -506,3 +506,15 @@ test('contradiction agent failure keeps rule-based results (step 3 degrade path)
   expect(v.contradictions.some((x) => x.field === 'geographies' && x.detected_by === 'rule')).toBe(true);
   expect(v.contradictions.some((x) => x.detected_by === 'llm')).toBe(false);
 });
+
+// DEP-09: the smoke test proves the new release answers by matching BUILD_SHA on /health/live.
+test('health/live reports the release build identity when BUILD_SHA is set', async () => {
+  const { app } = await createTestApp({}, { BUILD_SHA: 'e068543' });
+  const live = await app.inject({ method: 'GET', url: '/health/live' });
+  expect(live.statusCode).toBe(200);
+  expect(live.json()).toMatchObject({ ok: true, service: 'finsentinel', build: 'e068543' });
+  await app.close();
+  const { app: plain } = await createTestApp();
+  expect((await plain.inject({ method: 'GET', url: '/health/live' })).json().build).toBeNull();
+  await plain.close();
+});

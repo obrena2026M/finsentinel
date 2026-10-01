@@ -107,13 +107,32 @@ function Get-AppProcesses {
     $esc = [regex]::Escape($InstallDir)
     Get-CimInstance Win32_Process -Filter "Name='node.exe'" | Where-Object { $_.CommandLine -and ($_.CommandLine -match $esc) }
 }
+function Get-PortOwner {
+    # PID of the process listening on the app port, if any.
+    $c = Get-NetTCPConnection -LocalPort $Port -State Listen -ErrorAction SilentlyContinue | Select-Object -First 1
+    if ($c) { return [int]$c.OwningProcess }
+    return $null
+}
 function Stop-App {
+    # Three independent ways to find the server, because Stop-ScheduledTask only kills the launcher
+    # and leaves node.exe orphaned (found during the Stage 05 verification run):
+    #   1. the scheduled task, 2. node.exe whose command line names this installation,
+    #   3. whatever still listens on the port. Then wait until the port is actually free.
     $task = Get-ScheduledTask -TaskName $TaskName -ErrorAction SilentlyContinue
     if ($task -and $task.State -eq 'Running') { Stop-ScheduledTask -TaskName $TaskName; Write-Info "scheduled task stopped" }
     $procs = @(Get-AppProcesses)
     foreach ($p in $procs) { Stop-Process -Id $p.ProcessId -Force -ErrorAction SilentlyContinue }
     if ($procs.Count) { Write-Info ("{0} node process(es) terminated" -f $procs.Count) }
-    Start-Sleep -Milliseconds 800
+    $owner = Get-PortOwner
+    if ($owner) {
+        $op = Get-Process -Id $owner -ErrorAction SilentlyContinue
+        if ($op -and $op.ProcessName -eq 'node') { Stop-Process -Id $owner -Force -ErrorAction SilentlyContinue; Write-Info ("node pid {0} on port {1} terminated" -f $owner, $Port) }
+    }
+    $deadline = (Get-Date).AddSeconds(15)
+    while ((Get-PortOwner) -and (Get-Date) -lt $deadline) { Start-Sleep -Milliseconds 300 }
+    $owner = Get-PortOwner
+    if ($owner) { throw ("port {0} is still held by pid {1} ({2}); refusing to start a second server" -f $Port, $owner, (Get-Process -Id $owner -ErrorAction SilentlyContinue).ProcessName) }
+    Start-Sleep -Milliseconds 500
 }
 function Register-App([string]$ReleaseDir) {
     # DEP-08: the app runs as a Task Scheduler task owned by the deploying user: survives the
@@ -134,8 +153,12 @@ function Start-App([string]$ReleaseDir) {
     Start-ScheduledTask -TaskName $TaskName
     Write-Info ("task {0} started" -f $TaskName)
 }
-function Invoke-Smoke([string]$ReleaseDir) {
-    Invoke-Native 'smoke test' $nodeExe @('scripts\smoke.ts', ("--url=http://127.0.0.1:{0}" -f $Port), '--wait=90000') $ReleaseDir
+function Invoke-Smoke([string]$ReleaseDir, [string]$ExpectBuild = '') {
+    # DEP-09: with -ExpectBuild the smoke test also proves that the responding server IS the new
+    # release (/health/live reports BUILD_SHA), not a leftover process from the previous one.
+    $args = @('scripts\smoke.ts', ("--url=http://127.0.0.1:{0}" -f $Port), '--wait=90000')
+    if ($ExpectBuild) { $args += ("--expect-build={0}" -f $ExpectBuild) }
+    Invoke-Native 'smoke test' $nodeExe $args $ReleaseDir
 }
 function Set-Current([string]$ReleaseDir) {
     if (Test-Path $CurrentLink) { (Get-Item $CurrentLink).Delete() }
@@ -255,7 +278,8 @@ if (-not (Test-Path $SharedEnv)) {
     Write-Ok "shared\.env exists; left untouched"
 }
 Copy-Item $SharedEnv (Join-Path $ReleaseDir '.env') -Force
-Write-Ok "shared\.env copied into the release"
+Add-Content -Path (Join-Path $ReleaseDir '.env') -Value ("BUILD_SHA={0}" -f $sha) -Encoding ASCII
+Write-Ok ("shared\.env copied into the release (+ BUILD_SHA={0})" -f $sha)
 
 Write-Step "Installing dependencies and building the web app"
 Invoke-Native 'npm ci' $npmCmd @('ci', '--no-fund', '--no-audit', '--silent') $ReleaseDir
@@ -278,8 +302,8 @@ Write-Ok ("current -> {0}" -f $ReleaseDir)
 
 Write-Step "Smoke test"
 try {
-    Invoke-Smoke $ReleaseDir
-    Write-Ok "smoke test passed"
+    Invoke-Smoke $ReleaseDir $sha
+    Write-Ok ("smoke test passed against build {0}" -f $sha)
 } catch {
     Write-Warn ("smoke test failed: {0}" -f $_.Exception.Message)
     if ($previous -and (Test-Path $previous)) {

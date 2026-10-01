@@ -26,6 +26,8 @@ function defaultUrl(): string {
 const base = arg('url', process.env.SMOKE_URL ?? defaultUrl()).replace(/\/$/, '');
 const waitMs = Number(arg('wait', '60000'));
 const expectWeb = arg('expect-web', '1') !== '0';
+/** When set, /health/live must report this BUILD_SHA: proves the new release answers, not a leftover process. */
+const expectBuild = arg('expect-build', '');
 
 type Check = { name: string; ok: boolean; detail: string };
 const checks: Check[] = [];
@@ -77,6 +79,15 @@ function finish(): void {
 async function main() {
   console.log(`FinSentinel smoke test against ${base}`);
   if (!(await waitForLive())) return finish();
+
+  if (expectBuild) {
+    const live = (await (await get('/health/live')).json().catch(() => ({}))) as { build?: string | null };
+    record(
+      'identity: /health/live reports expected build',
+      live.build === expectBuild,
+      `expected ${expectBuild}, got ${live.build ?? 'null'}`,
+    );
+  }
 
   const ready = await get('/health/ready');
   const body = (await ready.json().catch(() => ({}))) as { ok?: boolean; checks?: Record<string, unknown> };

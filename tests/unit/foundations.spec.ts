@@ -60,6 +60,8 @@ test.describe('config', () => {
       loadEnv({ ...base, NODE_ENV: 'production', SEED_ON_START: '1', ALLOW_SEED: '1' }).SEED_ON_START,
     ).toBe(true);
     expect(loadEnv({ ...base, NODE_ENV: 'production', SEED_ON_START: '0' }).SEED_ON_START).toBe(false);
+    expect(loadEnv({ ...base, BUILD_SHA: 'e068543' }).BUILD_SHA).toBe('e068543');
+    expect(loadEnv(base).BUILD_SHA).toBeUndefined();
   });
 
   test('llm config loads and prices unknown models at zero', () => {

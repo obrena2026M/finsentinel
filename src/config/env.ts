@@ -41,6 +41,8 @@ const EnvSchema = z.object({
   /** Comma-separated list of allowed browser origins. Unset = reflect the request origin (local dev only). */
   CORS_ORIGIN: z.string().optional(),
   NODE_ENV: z.string().optional(),
+  /** Release identity written by scripts/deploy.ps1 (git short SHA); reported by /health/live (DEP-09). */
+  BUILD_SHA: z.string().optional(),
 });
 
 export type Env = z.infer<typeof EnvSchema> & { corsOrigins: string[] | true };
