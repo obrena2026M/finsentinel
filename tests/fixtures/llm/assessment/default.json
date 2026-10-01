@@ -1,0 +1,67 @@
+{
+  "summary": "Generic mock assessment: no case-specific fixture matched this case, so every dimension is scored Moderate pending analyst review. Facts that are missing are treated as risk drivers rather than assumed. The analyst must confirm facts, attach evidence and set control ratings before this case can be finalized.",
+  "dimensions": [
+    {
+      "dimension": "product",
+      "recommended_score": 3,
+      "narrative": "Insufficient case-specific information; moderate pending analyst review."
+    },
+    {
+      "dimension": "customer",
+      "recommended_score": 3,
+      "narrative": "Insufficient case-specific information; moderate pending analyst review."
+    },
+    {
+      "dimension": "geography",
+      "recommended_score": 3,
+      "narrative": "Insufficient case-specific information; moderate pending analyst review."
+    },
+    {
+      "dimension": "channel",
+      "recommended_score": 3,
+      "narrative": "Insufficient case-specific information; moderate pending analyst review."
+    },
+    {
+      "dimension": "transaction",
+      "recommended_score": 3,
+      "narrative": "Insufficient case-specific information; moderate pending analyst review."
+    },
+    {
+      "dimension": "third_party",
+      "recommended_score": 3,
+      "narrative": "Insufficient case-specific information; moderate pending analyst review."
+    },
+    {
+      "dimension": "technology",
+      "recommended_score": 3,
+      "narrative": "Insufficient case-specific information; moderate pending analyst review."
+    },
+    {
+      "dimension": "process",
+      "recommended_score": 3,
+      "narrative": "Insufficient case-specific information; moderate pending analyst review."
+    }
+  ],
+  "claims": [
+    {
+      "dimension": "product",
+      "text": "No new product or change may launch without a completed financial crime risk assessment approved by the Risk Committee.",
+      "citations": [
+        {
+          "cite_source": "AML §4.1",
+          "quote": "No new product, feature, channel, geography or third-party arrangement may launch without a completed financial crime risk assessment"
+        }
+      ]
+    },
+    {
+      "dimension": "product",
+      "text": "Controls may reduce residual risk but do not eliminate inherent risk.",
+      "citations": [
+        {
+          "cite_source": "AML §2.1",
+          "quote": "Controls may reduce residual risk but do not eliminate inherent risk"
+        }
+      ]
+    }
+  ]
+}

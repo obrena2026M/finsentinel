@@ -1,0 +1,20 @@
+{
+  "dimensions": [
+    {
+      "dimension": "product",
+      "triggered_by_fields": ["product_description"],
+      "rationale": "New feature on an existing product."
+    },
+    {
+      "dimension": "customer",
+      "triggered_by_fields": ["customer_segment"],
+      "rationale": "Existing retail customer base; no new segment."
+    },
+    {
+      "dimension": "transaction",
+      "triggered_by_fields": ["transaction_type", "monitoring_coverage"],
+      "rationale": "New scheduled transfer type; coverage stated."
+    },
+    { "dimension": "channel", "triggered_by_fields": ["channel"], "rationale": "Existing mobile channel." }
+  ]
+}

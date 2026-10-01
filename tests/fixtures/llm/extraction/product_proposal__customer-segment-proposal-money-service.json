@@ -1,0 +1,145 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "product_description",
+      "value": "Commercial operating account opened to licensed money service businesses (currency exchange and remittance agents)",
+      "confidence": 0.96,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "open the commercial operating account to licensed money service businesses"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "customer_segment",
+      "value": "money service businesses (new segment, currently excluded)",
+      "confidence": 0.96,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 1, "quote": "This segment is currently excluded by policy" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Canada", "global remittance destinations incl. higher-risk jurisdictions"],
+      "confidence": 0.88,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 3,
+          "quote": "Customers remit funds globally, including to higher-risk jurisdictions"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "channel",
+      "value": "branch and relationship manager (existing)",
+      "confidence": 0.93,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 4, "quote": "Existing branch and relationship-manager channel" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party",
+      "value": false,
+      "confidence": 0.95,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 4, "quote": "No third party is involved" }],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_volume",
+      "value": "40,000 transactions per month across the segment",
+      "confidence": 0.94,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 5,
+          "quote": "Expected transaction volume is 40,000 transactions per month across the segment"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_value",
+      "value": "average CAD 2,500",
+      "confidence": 0.9,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 5, "quote": "Average transaction value is CAD 2,500" }],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_velocity",
+      "value": "high velocity of cash deposits and outbound wires",
+      "confidence": 0.9,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 5, "quote": "high velocity of cash deposits and outbound wires" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_type",
+      "value": "cash deposits, wires, e-transfers",
+      "confidence": 0.94,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 5,
+          "quote": "Transaction types include cash deposits, wires and e-transfers"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "controls",
+      "value": [
+        "sanctions screening on wires",
+        "annual EDD reviews",
+        "agent-level activity reporting (proposed)"
+      ],
+      "confidence": 0.88,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 6,
+          "quote": "Annual EDD reviews and agent-level activity reporting are proposed"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "monitoring_coverage",
+      "value": "gap — existing scenarios do not cover cash-intensive remittance; dedicated MSB scenarios planned",
+      "confidence": 0.92,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 6,
+          "quote": "existing scenarios do not cover cash-intensive remittance activity"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "technology",
+      "value": "no technology change",
+      "confidence": 0.9,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 4, "quote": "No technology change" }],
+      "missing_reason": null
+    },
+    {
+      "field": "process_change",
+      "value": "specialist onboarding team; new quarterly agent reviews",
+      "confidence": 0.9,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 7, "quote": "Ongoing agent reviews will be a new quarterly process" }
+      ],
+      "missing_reason": null
+    }
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "_comment": "Initial thresholds per Architecture §15 (PRD OQ-03). Tune after the first golden-dataset run.",
+  "software": {
+    "unit": { "allPass": true },
+    "integration": { "allPass": true },
+    "security": { "allPass": true },
+    "adversarial": { "allPass": true },
+    "e2e": { "allPass": true },
+    "coverage": { "lines": 95, "branches": 80, "functions": 95, "_note": "c8 over the non-browser Playwright projects; src/server.ts (entry point) excluded" }
+  },
+  "ai": {
+    "extractionAccuracy": { "min": 0.9 },
+    "retrievalPrecision": { "min": 0.8 },
+    "groundingSupportedRate": { "min": 0.85, "_note": "complement of unsupportedClaimRate while mock fixtures include deliberate unsupported claims; raise to 0.9 with the real model" },
+    "unsupportedClaimRate": { "max": 0.15, "_note": "mock fixtures deliberately include one unsupported vendor claim per high-risk case to exercise grounding; tighten to 0.05 after the first real-model run" },
+    "bandAgreement": { "min": 0.8 },
+    "adversarialPassRate": { "min": 1.0 }
+  },
+  "governance": {
+    "unauthorizedDecisionsAllowed": 0,
+    "overridesWithoutRationaleAllowed": 0,
+    "auditIntegrity": true
+  }
+}

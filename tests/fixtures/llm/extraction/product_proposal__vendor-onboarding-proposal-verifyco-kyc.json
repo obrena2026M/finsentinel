@@ -1,0 +1,139 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "product_description",
+      "value": "Replace in-house business identity verification with VerifyCo Ltd KYC screening via API",
+      "confidence": 0.96,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "replace the in-house identity verification step for business onboarding with VerifyCo Ltd"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "customer_segment",
+      "value": "new business customers (SMB and commercial)",
+      "confidence": 0.93,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 2,
+          "quote": "All new business customers (SMB and commercial) onboarded in Canada"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Canada", "United States"],
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 3,
+          "quote": "VerifyCo processes and stores data in Canada and the United States"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "channel",
+      "value": "web and branch (existing)",
+      "confidence": 0.92,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "Onboarding continues through the existing web and branch channels"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party",
+      "value": true,
+      "confidence": 0.97,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 1, "quote": "a third-party KYC screening vendor" }],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party_name",
+      "value": "VerifyCo Ltd",
+      "confidence": 0.97,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 1, "quote": "VerifyCo Ltd, a third-party KYC screening vendor" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_volume",
+      "value": "3,500 business onboardings per month (not payments)",
+      "confidence": 0.9,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 5, "quote": "Expected volume is 3,500 business onboardings per month" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_value",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "change affects onboarding, not payments"
+    },
+    {
+      "field": "controls",
+      "value": [
+        "vendor sanctions screening at onboarding",
+        "beneficial-owner data into customer risk rating"
+      ],
+      "confidence": 0.88,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 6,
+          "quote": "Sanctions screening at onboarding will be performed by VerifyCo instead of the in-house screening engine"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "monitoring_coverage",
+      "value": "unchanged; transaction monitoring unaffected",
+      "confidence": 0.9,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 6, "quote": "transaction monitoring is unaffected" }],
+      "missing_reason": null
+    },
+    {
+      "field": "technology",
+      "value": "API integration; identity documents transmitted to vendor",
+      "confidence": 0.92,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "Customer identity documents will be transmitted to VerifyCo for verification"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "process_change",
+      "value": "onboarding team reviews vendor results in a new dashboard",
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 7,
+          "quote": "The onboarding team will review VerifyCo results in a new dashboard"
+        }
+      ],
+      "missing_reason": null
+    }
+  ]
+}

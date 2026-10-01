@@ -1,0 +1,61 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": true,
+  "facts": [
+    {
+      "field": "third_party",
+      "value": true,
+      "confidence": 0.97,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "PayRail acts as the third-party processor for beneficiary payout and currency conversion"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party_name",
+      "value": "PayRail Inc.",
+      "confidence": 0.98,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "PayRail Inc. is a licensed payment processor headquartered in Toronto"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Canada", "Mexico"],
+      "confidence": 0.93,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 2, "quote": "Coverage for this engagement includes Canada and Mexico" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "controls",
+      "value": ["vendor-asserted AML controls (unverified)"],
+      "confidence": 0.6,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 3,
+          "quote": "PayRail has excellent AML controls and a mature compliance program"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_volume",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "not stated in vendor questionnaire"
+    }
+  ]
+}

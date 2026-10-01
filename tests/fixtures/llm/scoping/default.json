@@ -1,0 +1,30 @@
+{
+  "dimensions": [
+    {
+      "dimension": "product",
+      "triggered_by_fields": ["product_description"],
+      "rationale": "Every change touches the product dimension."
+    },
+    {
+      "dimension": "customer",
+      "triggered_by_fields": ["customer_segment"],
+      "rationale": "Customer segment is a required fact; missing or present it drives customer risk."
+    },
+    {
+      "dimension": "geography",
+      "triggered_by_fields": ["geographies"],
+      "rationale": "Geography is a required fact."
+    },
+    {
+      "dimension": "transaction",
+      "triggered_by_fields": ["transaction_volume", "transaction_value", "monitoring_coverage"],
+      "rationale": "Transaction characteristics and monitoring coverage are required."
+    },
+    {
+      "dimension": "third_party",
+      "triggered_by_fields": ["third_party"],
+      "rationale": "Third-party involvement must be established."
+    },
+    { "dimension": "channel", "triggered_by_fields": ["channel"], "rationale": "Channel is a required fact." }
+  ]
+}

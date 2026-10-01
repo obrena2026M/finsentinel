@@ -1,0 +1,48 @@
+name: ci
+
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_call:
+
+jobs:
+  pipeline:
+    runs-on: ubuntu-latest
+    env:
+      LLM_GATEWAY: mock
+      SESSION_SECRET: ci-secret-ci-secret-ci-secret-0123456789abcdef
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npx biome check .
+      - name: Type-check
+        run: npx tsc --noEmit -p tsconfig.json
+      - name: Unit / integration / security / adversarial with coverage thresholds (c8 + Playwright, no browser)
+        run: npx c8 playwright test
+      - name: AI evaluation (golden dataset, mock gateway)
+        run: node evaluations/run.ts --gateway=mock
+      - name: Build web
+        run: npm run build
+      - name: Install Chromium
+        run: npx playwright install --with-deps chromium
+      - name: E2E (light + dark)
+        run: npx playwright test -c playwright.e2e.config.ts
+      - name: Quality gate
+        run: node scripts/quality-gate.ts
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: quality-artifacts
+          path: |
+            test-results/
+            playwright-report/
+            playwright-report-e2e/
+            evaluations/results/
+            coverage/lcov-report/
+            coverage/coverage-summary.json

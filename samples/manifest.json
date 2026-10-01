@@ -1,0 +1,51 @@
+{
+  "_comment": "Sample document sets per change type for creating demo cases. Titles are fixed so the mock LLM fixtures (keyed by title/heading slugs) resolve. Paths are relative to the repo root.",
+  "samples": {
+    "product": {
+      "title": "International Instant Payments for SMB customers",
+      "description": "Launch near-instant cross-border payments for existing SMB customers in Canada and Mexico via the public API channel, executed by third-party processor PayRail Inc. Phase one only; additional corridors after six months.",
+      "documents": [
+        { "kind": "product_proposal", "file": "tests/fixtures/cases/RA-1001/product_proposal.md" },
+        { "kind": "vendor_questionnaire", "file": "tests/fixtures/cases/RA-1001/vendor_questionnaire.md" }
+      ]
+    },
+    "feature": {
+      "title": "Savings Goal feature in mobile app",
+      "description": "Add a Savings Goal feature to the existing mobile banking app letting existing retail customers schedule automatic transfers between their own chequing and savings accounts. Canada only, no third party.",
+      "documents": [{ "kind": "product_proposal", "file": "tests/fixtures/cases/RA-LOW/product_proposal.md" }]
+    },
+    "process": {
+      "title": "Manual Wire Exception Handling process change",
+      "description": "Move failed outbound wire exceptions from the automated repair queue to a manual handling process run by the wire operations team for six months while the repair engine is rebuilt. Domestic and cross-border wires affected.",
+      "documents": [{ "kind": "process_doc", "file": "samples/process/process_change.md" }]
+    },
+    "vendor": {
+      "title": "New KYC Screening Vendor onboarding",
+      "description": "Replace the in-house identity verification step for business onboarding with VerifyCo Ltd, a third-party KYC screening vendor providing document verification, beneficial-owner lookups and sanctions screening via API.",
+      "documents": [
+        { "kind": "product_proposal", "file": "samples/vendor/vendor_onboarding_proposal.md" },
+        { "kind": "vendor_questionnaire", "file": "samples/vendor/vendor_questionnaire.md" }
+      ]
+    },
+    "geography": {
+      "title": "Expansion of Business Accounts to Mexico",
+      "description": "Offer existing business operating accounts to Mexican-incorporated SMBs with a Canadian parent, including inbound and outbound MXN wires, through the existing relationship-manager channel.",
+      "documents": [{ "kind": "product_proposal", "file": "samples/geography/geographic_expansion.md" }]
+    },
+    "customer_segment": {
+      "title": "Onboarding Money Service Businesses",
+      "description": "Open the commercial operating account to licensed money service businesses (currency exchange and remittance agents) in Canada, a segment currently excluded by policy, subject to enhanced due diligence.",
+      "documents": [{ "kind": "product_proposal", "file": "samples/customer_segment/segment_proposal.md" }]
+    },
+    "channel": {
+      "title": "WhatsApp Banking channel launch",
+      "description": "Enable balance enquiries, payee management and domestic transfers up to CAD 1,000 through a WhatsApp Business conversational channel operated with a messaging vendor, for existing verified retail customers.",
+      "documents": [{ "kind": "product_proposal", "file": "samples/channel/channel_proposal.md" }]
+    },
+    "transaction": {
+      "title": "Raise Daily Transfer Limit for retail",
+      "description": "Increase the retail e-transfer daily limit from CAD 3,000 to CAD 10,000 and the per-transaction limit from CAD 3,000 to CAD 5,000 for customers with 12 months tenure and no fraud flags.",
+      "documents": [{ "kind": "product_proposal", "file": "samples/transaction/limit_change.md" }]
+    }
+  }
+}

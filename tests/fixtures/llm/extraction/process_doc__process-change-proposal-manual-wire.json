@@ -1,0 +1,140 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "product_description",
+      "value": "Manual handling of failed outbound wire exceptions for six months while the repair engine is rebuilt",
+      "confidence": 0.95,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "exceptions will be handled manually by the wire operations team for a period of six months"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "customer_segment",
+      "value": "existing retail and commercial",
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 2,
+          "quote": "All existing retail and commercial customers who send wires are affected"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Canada", "United States", "United Kingdom", "Mexico"],
+      "confidence": 0.92,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 3,
+          "quote": "Cross-border wires to existing corridors including the United States, the United Kingdom and Mexico"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "channel",
+      "value": "operations workstation (no customer channel change)",
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "Operations staff will use the existing payment operations workstation"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party",
+      "value": false,
+      "confidence": 0.95,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 4, "quote": "No third party is involved" }],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_volume",
+      "value": "approximately 900 exceptions per month",
+      "confidence": 0.94,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 5, "quote": "Approximately 900 wire exceptions per month" }],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_value",
+      "value": "average CAD 18,000; maximum CAD 250,000",
+      "confidence": 0.94,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 5,
+          "quote": "Average exception value is CAD 18,000 with a maximum of CAD 250,000"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_type",
+      "value": "outbound wire transfer",
+      "confidence": 0.95,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 5, "quote": "Transaction type is outbound wire transfer" }],
+      "missing_reason": null
+    },
+    {
+      "field": "controls",
+      "value": [
+        "pre-queue sanctions screening",
+        "wire monitoring on re-entry",
+        "four-eyes approval above CAD 50,000"
+      ],
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 6,
+          "quote": "Four-eyes approval applies to manual repairs above CAD 50,000"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "monitoring_coverage",
+      "value": "repaired wires re-enter standard wire monitoring scenarios",
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 6,
+          "quote": "repaired wires re-enter the standard wire monitoring scenarios"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "technology",
+      "value": "shared spreadsheet for exception tracking",
+      "confidence": 0.85,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 4, "quote": "A shared spreadsheet will be used to track exceptions" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "process_change",
+      "value": "operators may edit beneficiary details before release; single-operator below CAD 50,000",
+      "confidence": 0.93,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 7, "quote": "operators may edit beneficiary details before release" }
+      ],
+      "missing_reason": null
+    }
+  ]
+}

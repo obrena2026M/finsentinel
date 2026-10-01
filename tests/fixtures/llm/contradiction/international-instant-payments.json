@@ -1,0 +1,22 @@
+{
+  "contradictions": [
+    {
+      "field": "monitoring_coverage",
+      "candidates": [
+        {
+          "value": "partial — existing domestic wire scenarios; cross-border scenario planned for phase two",
+          "doc_id": "product_proposal",
+          "chunk_ix": 6,
+          "quote": "cross-border instant payments are currently covered by the existing monitoring scenarios for domestic wires"
+        },
+        {
+          "value": "real-time monitoring performed by PayRail on the Bank's behalf",
+          "doc_id": "vendor_questionnaire",
+          "chunk_ix": 3,
+          "quote": "Real-time monitoring of payout activity is performed by PayRail on the Bank's behalf"
+        }
+      ],
+      "explanation": "The proposal describes partial Bank-side coverage using domestic scenarios, while the vendor states it performs real-time monitoring on the Bank's behalf; the documents disagree on who monitors and how completely."
+    }
+  ]
+}

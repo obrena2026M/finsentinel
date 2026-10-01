@@ -1,0 +1,39 @@
+{
+  "dimensions": [
+    {
+      "dimension": "geography",
+      "triggered_by_fields": ["geographies"],
+      "rationale": "Cross-border corridor to Mexico, a higher-risk jurisdiction; vendor coverage also mentions Brazil."
+    },
+    {
+      "dimension": "transaction",
+      "triggered_by_fields": [
+        "transaction_type",
+        "transaction_value",
+        "transaction_volume",
+        "monitoring_coverage"
+      ],
+      "rationale": "Instant settlement, USD 25,000 maximum, volume unknown and monitoring coverage only partial."
+    },
+    {
+      "dimension": "third_party",
+      "triggered_by_fields": ["third_party", "third_party_name"],
+      "rationale": "PayRail performs payout, conversion and screening; fourth-party partner network in Brazil."
+    },
+    {
+      "dimension": "channel",
+      "triggered_by_fields": ["channel"],
+      "rationale": "Non-face-to-face API channel."
+    },
+    {
+      "dimension": "customer",
+      "triggered_by_fields": ["customer_segment"],
+      "rationale": "SMB segment gaining cross-border capability triggers EDD considerations."
+    },
+    {
+      "dimension": "process",
+      "triggered_by_fields": ["process_change"],
+      "rationale": "Manual exception handling for failed payouts."
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "all": true,
+  "include": ["src/**/*.ts"],
+  "exclude": ["src/server.ts", "src/db/migrations/**"],
+  "reporter": ["text", "text-summary", "lcov", "json-summary"],
+  "reports-dir": "coverage",
+  "temp-directory": "coverage/tmp",
+  "clean": true,
+  "check-coverage": true,
+  "lines": 95,
+  "functions": 95,
+  "branches": 80,
+  "statements": 95
+}

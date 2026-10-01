@@ -1,0 +1,71 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "third_party",
+      "value": true,
+      "confidence": 0.97,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "VerifyCo acts as the third-party provider for document verification, beneficial-owner lookups and sanctions screening"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party_name",
+      "value": "VerifyCo Ltd",
+      "confidence": 0.98,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "VerifyCo Ltd is a regulated identity verification provider headquartered in Vancouver"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Canada", "United States"],
+      "confidence": 0.9,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 2, "quote": "Data is processed in Canada and the United States" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "controls",
+      "value": [
+        "vendor-asserted AML controls (unverified)",
+        "SOC 2 Type II report",
+        "24-hour sanctions list updates"
+      ],
+      "confidence": 0.7,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 3,
+          "quote": "VerifyCo has excellent AML controls and holds a SOC 2 Type II report"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "technology",
+      "value": "non-Canadian passport checks subcontracted to a US provider",
+      "confidence": 0.85,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "performed by a subcontracted specialist provider in the United States"
+        }
+      ],
+      "missing_reason": null
+    }
+  ]
+}

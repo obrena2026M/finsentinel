@@ -1,0 +1,72 @@
+{
+  "summary": "A new non-face-to-face conversational channel operated through a third-party messaging vendor for existing retail customers. Transaction values are capped at CAD 1,000 and payee additions have a cooling period, but channel-specific device and session monitoring is not yet in place and the vendor's role in message handling needs assessment.",
+  "dimensions": [
+    {
+      "dimension": "product",
+      "recommended_score": 2,
+      "narrative": "Existing transfer product on a new channel."
+    },
+    { "dimension": "customer", "recommended_score": 2, "narrative": "Existing verified retail customers." },
+    { "dimension": "geography", "recommended_score": 1, "narrative": "Domestic only." },
+    {
+      "dimension": "channel",
+      "recommended_score": 4,
+      "narrative": "New non-face-to-face channel on a consumer messaging platform."
+    },
+    {
+      "dimension": "transaction",
+      "recommended_score": 2,
+      "narrative": "Low values, capped; existing e-transfer scenarios apply."
+    },
+    {
+      "dimension": "third_party",
+      "recommended_score": 3,
+      "narrative": "Messaging vendor sits in the transaction path."
+    },
+    {
+      "dimension": "technology",
+      "recommended_score": 3,
+      "narrative": "OTP and PIN over a third-party messaging channel; no device monitoring yet."
+    },
+    { "dimension": "process", "recommended_score": 2, "narrative": "New dispute escalation path." }
+  ],
+  "claims": [
+    {
+      "dimension": "channel",
+      "text": "Non-face-to-face channels require authentication, identity verification and behavioural monitoring proportional to value.",
+      "citations": [
+        { "cite_source": "AML §6.1", "quote": "behavioural monitoring proportional to transaction value" }
+      ]
+    },
+    {
+      "dimension": "transaction",
+      "text": "The new channel must be mapped to an active monitoring scenario before launch.",
+      "citations": [
+        {
+          "cite_source": "TM §3.1",
+          "quote": "Every new transaction type, channel and destination country must be mapped to at least one active monitoring scenario before launch"
+        }
+      ]
+    },
+    {
+      "dimension": "third_party",
+      "text": "A vendor in the payment path is a critical vendor requiring due diligence before engagement.",
+      "citations": [
+        {
+          "cite_source": "TPRM §2.2",
+          "quote": "Third parties that process payments, hold customer data or perform compliance functions are critical vendors"
+        }
+      ]
+    },
+    {
+      "dimension": "product",
+      "text": "Controls may reduce residual risk but do not eliminate inherent risk.",
+      "citations": [
+        {
+          "cite_source": "AML §2.1",
+          "quote": "Controls may reduce residual risk but do not eliminate inherent risk"
+        }
+      ]
+    }
+  ]
+}

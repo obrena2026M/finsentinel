@@ -1,0 +1,62 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "product_description",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "mock gateway: no extraction fixture matches this document, so nothing is asserted"
+    },
+    {
+      "field": "customer_segment",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "mock gateway: no fixture for this document"
+    },
+    {
+      "field": "geographies",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "mock gateway: no fixture for this document"
+    },
+    {
+      "field": "channel",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "mock gateway: no fixture for this document"
+    },
+    {
+      "field": "third_party",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "mock gateway: no fixture for this document"
+    },
+    {
+      "field": "transaction_volume",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "mock gateway: no fixture for this document"
+    },
+    {
+      "field": "transaction_value",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "mock gateway: no fixture for this document"
+    },
+    {
+      "field": "monitoring_coverage",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "mock gateway: no fixture for this document"
+    }
+  ]
+}

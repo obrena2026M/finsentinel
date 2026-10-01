@@ -1,0 +1,27 @@
+How You Will Be Judged
+Expect the panel to probe decisions rather than features. Every choice you made should have a reason behind it.
+
+30%
+AI harness and agent orchestration
+Your architecture, how work is orchestrated, how context is managed, the data foundation the harness runs on, your instruction design, and how you divided the work between AI and people.
+20%
+SDLC automation
+How effectively AI is applied within each of the six delivery stages, and how those stages connect into a coherent flow rather than isolated experiments.
+15%
+Human-in-the-loop and governance
+Your review gates and the rationale for each. What risk is this gate controlling, and why is it placed here?
+10%
+Evaluation framework
+How you know the output is good. What you measure, how you measure it, and how failures feed back into improvement.
+10%
+Context engineering and requirement expansion
+How you researched an incomplete requirement, layered in domain knowledge and maintained that context across the workflow.
+5%
+Production readiness
+Scalability, security, architectural standards and reliability. A demo that works once is not the bar.
+5%
+Token efficiency
+Which models you used, where consumption concentrated and what you did to optimise it.
+5%
+Engineering judgement
+Distinguishing deterministic from probabilistic problems, and justifying where you chose traditional logic over an LLM.

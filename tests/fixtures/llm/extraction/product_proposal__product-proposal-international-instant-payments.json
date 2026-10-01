@@ -1,0 +1,160 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "product_description",
+      "value": "International Instant Payments — near-instant cross-border payments for existing SMB customers",
+      "confidence": 0.97,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "a new product that lets existing small and medium business (SMB) customers send near-instant cross-border payments"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "customer_segment",
+      "value": "SMB",
+      "confidence": 0.96,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 2,
+          "quote": "The product is available to existing SMB customers with an active business operating account"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Canada", "Mexico"],
+      "confidence": 0.95,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 3, "quote": "Phase one covers Canada and Mexico only" }],
+      "missing_reason": null
+    },
+    {
+      "field": "channel",
+      "value": "API",
+      "confidence": 0.98,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 4, "quote": "Payments are initiated through our public API channel" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party",
+      "value": true,
+      "confidence": 0.93,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 4, "quote": "integrated with the third-party processor PayRail Inc." }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party_name",
+      "value": "PayRail Inc.",
+      "confidence": 0.93,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "third-party processor PayRail Inc., which performs currency conversion and beneficiary payout"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_value",
+      "value": "average USD 4,200; maximum USD 25,000",
+      "confidence": 0.94,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 5,
+          "quote": "Expected average transaction value is USD 4,200 with a per-transaction maximum of USD 25,000"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_type",
+      "value": "instant credit transfer",
+      "confidence": 0.95,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 5, "quote": "Expected transaction type is instant credit transfer" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_volume",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "document states volume projections are not yet finalised"
+    },
+    {
+      "field": "transaction_velocity",
+      "value": "daily velocity limits enforced by API gateway (limits not specified)",
+      "confidence": 0.62,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 6, "quote": "Daily velocity limits are enforced by the API gateway" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "controls",
+      "value": [
+        "sanctions screening",
+        "transaction monitoring (domestic wire scenarios)",
+        "API gateway velocity limits"
+      ],
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 6,
+          "quote": "Existing sanctions screening runs on all outbound payments before release"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "monitoring_coverage",
+      "value": "partial — covered by existing domestic wire scenarios; dedicated cross-border scenario planned for phase two",
+      "confidence": 0.88,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 6,
+          "quote": "cross-border instant payments are currently covered by the existing monitoring scenarios for domestic wires"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "technology",
+      "value": "public API integrated with PayRail; existing OAuth client credentials",
+      "confidence": 0.9,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 4, "quote": "Authentication uses existing OAuth client credentials" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "process_change",
+      "value": "manual exception handling for failed payouts for first three months",
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 7,
+          "quote": "Exception handling for failed payouts will be a manual process for the first three months"
+        }
+      ],
+      "missing_reason": null
+    }
+  ]
+}

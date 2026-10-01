@@ -1,0 +1,65 @@
+{
+  "summary": "The change is a low-complexity feature for the existing retail customer base enabling scheduled transfers between a customer's own accounts in Canada through the existing mobile channel. No new segment, geography, channel or third party is introduced. Residual exposure is limited to profile refresh and monitoring of changed transfer behaviour.",
+  "dimensions": [
+    {
+      "dimension": "product",
+      "recommended_score": 2,
+      "narrative": "Feature addition on an existing product with no new payment rails."
+    },
+    {
+      "dimension": "customer",
+      "recommended_score": 1,
+      "narrative": "Existing verified retail customers only."
+    },
+    { "dimension": "geography", "recommended_score": 1, "narrative": "Domestic Canada only." },
+    {
+      "dimension": "channel",
+      "recommended_score": 2,
+      "narrative": "Existing mobile channel with existing authentication."
+    },
+    {
+      "dimension": "transaction",
+      "recommended_score": 2,
+      "narrative": "Own-account transfers with low values; covered by existing account activity monitoring."
+    },
+    { "dimension": "third_party", "recommended_score": 1, "narrative": "No third party involved." },
+    {
+      "dimension": "technology",
+      "recommended_score": 2,
+      "narrative": "In-house build on the existing core platform."
+    },
+    { "dimension": "process", "recommended_score": 1, "narrative": "No operational process change." }
+  ],
+  "claims": [
+    {
+      "dimension": "customer",
+      "text": "Enabling a new feature for the existing customer base without a new segment or geography does not require re-verification, provided the expected activity profile is updated.",
+      "citations": [
+        {
+          "cite_source": "KYC §6.2",
+          "quote": "does not require re-verification, provided the expected activity profile is updated"
+        }
+      ]
+    },
+    {
+      "dimension": "product",
+      "text": "Even a low-risk feature requires a completed financial crime risk assessment before launch.",
+      "citations": [
+        {
+          "cite_source": "AML §4.1",
+          "quote": "No new product, feature, channel, geography or third-party arrangement may launch without a completed financial crime risk assessment"
+        }
+      ]
+    },
+    {
+      "dimension": "transaction",
+      "text": "Controls may reduce residual risk but do not eliminate inherent risk.",
+      "citations": [
+        {
+          "cite_source": "AML §2.1",
+          "quote": "Controls may reduce residual risk but do not eliminate inherent risk"
+        }
+      ]
+    }
+  ]
+}

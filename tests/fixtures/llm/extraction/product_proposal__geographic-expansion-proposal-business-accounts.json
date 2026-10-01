@@ -1,0 +1,144 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "product_description",
+      "value": "Business operating accounts for Mexican-incorporated SMBs with a Canadian parent, with MXN wires",
+      "confidence": 0.96,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "offer business operating accounts to Mexican-incorporated SMBs that have a Canadian parent company"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "customer_segment",
+      "value": "SMB (Mexican-incorporated, Canadian parent)",
+      "confidence": 0.94,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 2,
+          "quote": "SMB customers incorporated in Mexico with an existing Canadian parent relationship"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Mexico", "Canada", "United States"],
+      "confidence": 0.95,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 3,
+          "quote": "Beneficial owners may reside in Mexico, Canada or the United States"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "channel",
+      "value": "relationship manager (existing)",
+      "confidence": 0.93,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "Onboarding and servicing through the existing relationship-manager channel"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party",
+      "value": false,
+      "confidence": 0.85,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 4, "quote": "No third party is involved for account servicing" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_volume",
+      "value": "6,000 wires per month",
+      "confidence": 0.95,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 5, "quote": "Expected transaction volume is 6,000 wires per month" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_value",
+      "value": "average CAD 22,000; maximum CAD 500,000",
+      "confidence": 0.95,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 5,
+          "quote": "Average transaction value is CAD 22,000 with a maximum of CAD 500,000"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_type",
+      "value": "inbound and outbound wire transfers",
+      "confidence": 0.95,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 5,
+          "quote": "Transaction types are inbound and outbound wire transfers"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "controls",
+      "value": ["sanctions screening on all wires", "enhanced due diligence at onboarding"],
+      "confidence": 0.9,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 6, "quote": "Enhanced due diligence will be applied at onboarding" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "monitoring_coverage",
+      "value": "existing cross-border wire scenarios; no Mexico-specific scenario yet",
+      "confidence": 0.9,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 6, "quote": "no Mexico-specific scenario exists yet" }],
+      "missing_reason": null
+    },
+    {
+      "field": "technology",
+      "value": "existing Mexican correspondent banking",
+      "confidence": 0.85,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "correspondent banking uses the existing Mexican correspondent"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "process_change",
+      "value": "Spanish-language documentation review by two bilingual relationship managers",
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 7,
+          "quote": "Spanish-language documentation review will be performed by two bilingual relationship managers"
+        }
+      ],
+      "missing_reason": null
+    }
+  ]
+}

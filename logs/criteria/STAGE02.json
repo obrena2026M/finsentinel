@@ -1,0 +1,69 @@
+{
+  "stage": "02",
+  "name": "Design",
+  "date": "2026-09-28",
+  "ai_usage": "Claude Code surveyed the developer machine (tool versions, TLS proxy diagnosis, SQLite feature probe), wrote the tools recommendation, then produced the architecture, data model and UX design documents. It loaded the Claude API reference to use current model IDs, pricing, structured-output and caching rules rather than memory. All 10 PRD open questions were closed with numbered architecture decisions.",
+  "criteria": {
+    "ai_harness": {
+      "done": ["15 architecture decisions AD-01..AD-15", "10-step code-orchestrated pipeline with per-step failure behaviour", "Context builder with cache breakpoints", "Model routing: Haiku 4.5 cheap steps, Opus 5 reasoning", "Gateway interface with mock for tests"],
+      "evidence": ["documents/STAGE02_Design_Architecture.md §1, §5"],
+      "decisions": [
+        { "decision": "Workflow tier, not agent loop (AD-02)", "reason": "Fixed order is a governance control and is testable" },
+        { "decision": "Structured JSON via zod at every agent boundary (AD-03)", "reason": "Removes the invalid-JSON failure class and makes schemas the contract" },
+        { "decision": "Deterministic grounding first (AD-07)", "reason": "A quote check cannot be fooled by fluent prose" }
+      ],
+      "gaps": [],
+      "self_score": 5
+    },
+    "sdlc_automation": {
+      "done": ["Design derived from PRD IDs; every section carries traceability tables", "Tools document selected the stack from a real environment survey"],
+      "evidence": ["documents/tools.md", "Architecture §18, Data Model §14, UX §9"],
+      "decisions": [{ "decision": "Playwright Test as the single runner for all test levels", "reason": "One config, one report, one CI step; non-browser projects launch no browser" }],
+      "gaps": [],
+      "self_score": 4
+    },
+    "human_in_loop": {
+      "done": ["Finalize guards, committee-only decision at DB trigger level, append-only audit with hash chain", "UX: three-column truth, blockers rail, shared rationale dialog, role tiles"],
+      "evidence": ["Architecture §9, §10", "Data Model §8, §9", "UX §1, §4.8, §4.9"],
+      "decisions": [{ "decision": "Simulation sign-in with role tiles, no password", "reason": "Hackathon simulation; RBAC unaffected; one route to swap for real auth" }],
+      "gaps": [],
+      "self_score": 5
+    },
+    "evaluation": {
+      "done": ["Evaluation runner design, initial numeric thresholds, quality gate script design"],
+      "evidence": ["Architecture §15", "config/quality-gates.json (Stage 03)"],
+      "decisions": [{ "decision": "Initial thresholds set, marked tunable after first run", "reason": "Closes OQ-03 without pretending to precision" }],
+      "gaps": [],
+      "self_score": 4
+    },
+    "context_engineering": {
+      "done": ["Environment research recorded (proxy CA fix, no compiler, SQLite FTS5 verified)", "Risk formula, retry, confidence, provider decisions made explicit"],
+      "evidence": ["documents/tools.md §1–§2", "Architecture §8, §17"],
+      "decisions": [{ "decision": "Verify SDK usage from the reference, not memory", "reason": "API shapes changed in 2025–2026; stale priors would break the gateway" }],
+      "gaps": [],
+      "self_score": 4
+    },
+    "production_readiness": {
+      "done": ["Security design, health probes, deployment/config plan, backup approach"],
+      "evidence": ["Architecture §13, §16"],
+      "decisions": [{ "decision": "Single process + SQLite file", "reason": "No Docker or compiler available; documented upgrade path" }],
+      "gaps": ["Scalability limits acknowledged, not tested"],
+      "self_score": 3
+    },
+    "token_efficiency": {
+      "done": ["Caching strategy AD-15, per-agent context caps, cost computed at read time from a price table"],
+      "evidence": ["Architecture §5.3, §5.6, §14"],
+      "decisions": [{ "decision": "Measure Opus at low effort before adding model tiers", "reason": "Caches are model-scoped; fewer models can be cheaper" }],
+      "gaps": [],
+      "self_score": 4
+    },
+    "engineering_judgement": {
+      "done": ["Per-step 'kind' column (deterministic vs LLM) in the pipeline table", "Deterministic risk engine with bounded mitigation and a floor"],
+      "evidence": ["Architecture §5.1, §8"],
+      "decisions": [{ "decision": "Vendor-asserted controls count as 'unverified' = no mitigation", "reason": "Self-assessment is not evidence (mirrors Sanctions §4.3)" }],
+      "gaps": [],
+      "self_score": 5
+    }
+  },
+  "tokens": { "task_ids": [3, 4, 5, 6, 7, 8, 9, 10, 11], "output": 461107, "cache_read": 19267689, "cache_write": 3956471, "subagents": 98792 }
+}

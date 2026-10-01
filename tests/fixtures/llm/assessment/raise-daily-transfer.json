@@ -1,0 +1,59 @@
+{
+  "summary": "Raising retail e-transfer limits more than triples the daily ceiling for roughly 60 percent of the retail base. Volume is unchanged but average and maximum values rise, and existing monitoring scenarios are tuned to the old limit and need re-tuning. No new customers, channels, geographies or third parties.",
+  "dimensions": [
+    {
+      "dimension": "product",
+      "recommended_score": 2,
+      "narrative": "Parameter change on an existing product."
+    },
+    {
+      "dimension": "customer",
+      "recommended_score": 2,
+      "narrative": "Tenured retail customers without fraud flags."
+    },
+    { "dimension": "geography", "recommended_score": 1, "narrative": "Domestic only." },
+    { "dimension": "channel", "recommended_score": 2, "narrative": "Existing mobile and web." },
+    {
+      "dimension": "transaction",
+      "recommended_score": 4,
+      "narrative": "Higher values through scenarios tuned to the old limit; structuring below reporting thresholds becomes easier."
+    },
+    {
+      "dimension": "third_party",
+      "recommended_score": 1,
+      "narrative": "No third party is involved in this change."
+    },
+    {
+      "dimension": "technology",
+      "recommended_score": 2,
+      "narrative": "Eligibility rule in the existing engine."
+    },
+    {
+      "dimension": "process",
+      "recommended_score": 1,
+      "narrative": "No process change; 90-day fraud monitoring."
+    }
+  ],
+  "claims": [
+    {
+      "dimension": "transaction",
+      "text": "Monitoring scenarios must include value rules for single and aggregate daily value, so thresholds must be re-tuned to the new limits.",
+      "citations": [{ "cite_source": "TM §4.2", "quote": "value rules (single and aggregate daily value)" }]
+    },
+    {
+      "dimension": "transaction",
+      "text": "New scenarios and tuning changes must be reviewed monthly for the first six months.",
+      "citations": [{ "cite_source": "TM §9.1", "quote": "reviewed monthly for the first six months" }]
+    },
+    {
+      "dimension": "product",
+      "text": "Controls may reduce residual risk but do not eliminate inherent risk.",
+      "citations": [
+        {
+          "cite_source": "AML §2.1",
+          "quote": "Controls may reduce residual risk but do not eliminate inherent risk"
+        }
+      ]
+    }
+  ]
+}

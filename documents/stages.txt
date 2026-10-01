@@ -1,0 +1,23 @@
+STAGE 01
+Requirements
+Understanding the business problem, expanding a vague brief into a working specification and conducting the research needed to fill the gaps.
+
+STAGE 02
+Design
+Solution and technical architecture, data model design, user experience decisions and the tools used to reach them.
+
+STAGE 03
+Development
+Code generation, data engineering, agent orchestration and the tool chain that connects them.
+
+STAGE 04
+Testing
+Validation, quality assurance and test automation.
+
+STAGE 05
+Deployment
+Production deployment approach and go-live path.
+
+STAGE 06
+Operations
+Monitoring, observability and continuous improvement.

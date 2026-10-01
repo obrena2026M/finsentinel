@@ -1,0 +1,85 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "third_party",
+      "value": true,
+      "confidence": 0.97,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "PayRail acts as the third-party processor for beneficiary payout and currency conversion"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party_name",
+      "value": "PayRail Inc.",
+      "confidence": 0.98,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "PayRail Inc. is a licensed payment processor headquartered in Toronto"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Canada", "Mexico", "Brazil"],
+      "confidence": 0.92,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 2,
+          "quote": "Coverage for this engagement includes Canada, Mexico and Brazil"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "controls",
+      "value": ["vendor sanctions screening of beneficiaries", "vendor real-time monitoring"],
+      "confidence": 0.85,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 3,
+          "quote": "Sanctions screening of beneficiaries is performed by PayRail prior to payout"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "monitoring_coverage",
+      "value": "vendor states real-time monitoring performed by PayRail on the Bank's behalf",
+      "confidence": 0.8,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 3,
+          "quote": "Real-time monitoring of payout activity is performed by PayRail on the Bank's behalf"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_volume",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "vendor states capacity (500,000 per month), not expected volume"
+    },
+    {
+      "field": "customer_segment",
+      "value": null,
+      "confidence": 0,
+      "sources": [],
+      "missing_reason": "vendor questionnaire does not describe the Bank's customer segment"
+    }
+  ]
+}

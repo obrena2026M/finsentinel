@@ -1,0 +1,76 @@
+{
+  "summary": "Outsourcing identity verification and onboarding sanctions screening to VerifyCo Ltd shifts a core compliance function to a third party with a US subcontractor for document checks. The vendor's compliance claims are self-asserted. Transaction monitoring is unaffected. The main risks are third-party dependency, data transfer to the United States and unverified screening effectiveness.",
+  "dimensions": [
+    {
+      "dimension": "product",
+      "recommended_score": 2,
+      "narrative": "Onboarding step change, not a new product."
+    },
+    {
+      "dimension": "customer",
+      "recommended_score": 3,
+      "narrative": "All new business customers depend on vendor verification quality."
+    },
+    {
+      "dimension": "geography",
+      "recommended_score": 2,
+      "narrative": "Canada with data processing in the United States."
+    },
+    { "dimension": "channel", "recommended_score": 2, "narrative": "Existing web and branch channels." },
+    { "dimension": "transaction", "recommended_score": 1, "narrative": "No payment change." },
+    {
+      "dimension": "third_party",
+      "recommended_score": 4,
+      "narrative": "Critical compliance function outsourced; fourth-party subcontractor; controls self-asserted."
+    },
+    {
+      "dimension": "technology",
+      "recommended_score": 3,
+      "narrative": "Identity documents transmitted to the vendor via API."
+    },
+    {
+      "dimension": "process",
+      "recommended_score": 2,
+      "narrative": "New review dashboard; escalations unchanged."
+    }
+  ],
+  "claims": [
+    {
+      "dimension": "third_party",
+      "text": "The processor's screening controls must be independently tested by the Bank before launch; a questionnaire response is not evidence.",
+      "citations": [
+        {
+          "cite_source": "SANCTIONS §4.3",
+          "quote": "The processor's screening controls must be independently tested by the Bank before launch"
+        }
+      ]
+    },
+    {
+      "dimension": "third_party",
+      "text": "The Bank remains responsible for sanctions compliance when a third party performs screening.",
+      "citations": [
+        { "cite_source": "SANCTIONS §4.3", "quote": "the Bank remains responsible for sanctions compliance" }
+      ]
+    },
+    {
+      "dimension": "third_party",
+      "text": "A vendor performing compliance functions is a critical vendor requiring financial crime due diligence before contract signature.",
+      "citations": [
+        {
+          "cite_source": "TPRM §2.2",
+          "quote": "Critical vendors require financial crime due diligence, including review of AML program documentation"
+        }
+      ]
+    },
+    {
+      "dimension": "third_party",
+      "text": "The vendor must be re-assessed on any material change in service scope, geography or ownership, including its US subcontractor arrangement.",
+      "citations": [
+        {
+          "cite_source": "TPRM §4.4",
+          "quote": "on any material change in service scope, geography or ownership"
+        }
+      ]
+    }
+  ]
+}

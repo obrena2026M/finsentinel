@@ -1,0 +1,157 @@
+# STAGE05 release pipeline (DEP-02..DEP-09). Tag v* -> verify (same gate as CI) -> package ->
+# staging deploy on a self-hosted Windows runner -> smoke -> human approval (GitHub Environment
+# "production" with required reviewers) -> production deploy -> smoke, with automatic rollback.
+name: release
+
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        type: choice
+        options: [staging, production]
+        default: staging
+      confirm:
+        description: Type the ref you selected above (e.g. v0.1.0) to confirm
+        required: true
+
+permissions:
+  contents: write
+  packages: write
+
+concurrency:
+  group: release
+  cancel-in-progress: false
+
+jobs:
+  # DEP-02: a release tag runs exactly the same lint/type/test/eval/e2e/quality-gate chain as every push.
+  verify:
+    uses: ./.github/workflows/ci.yml
+
+  # DEP-03: one immutable, versioned artefact per release: source + built web app + SBOM.
+  package:
+    needs: verify
+    runs-on: ubuntu-latest
+    env:
+      LLM_GATEWAY: mock
+      SESSION_SECRET: ci-secret-ci-secret-ci-secret-0123456789abcdef
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - name: Confirm manual dispatch ref
+        if: github.event_name == 'workflow_dispatch'
+        run: |
+          if [ "${{ inputs.confirm }}" != "${{ github.ref_name }}" ]; then
+            echo "confirmation '${{ inputs.confirm }}' does not match ref '${{ github.ref_name }}'"; exit 1
+          fi
+      - run: npm ci
+      - run: npm run build
+      - name: SBOM (CycloneDX, runtime dependencies)
+        run: npm sbom --sbom-format cyclonedx --omit dev > sbom.cyclonedx.json
+      - name: Package release
+        run: |
+          set -e
+          NAME="finsentinel-${GITHUB_REF_NAME}"
+          OUT="dist/$NAME"
+          mkdir -p "$OUT/web" "$OUT/tests"
+          # Runtime set: server source, config, prompts, policies, samples, scripts, mock fixtures (mock gateway).
+          cp -r src config prompts policies samples scripts package.json package-lock.json .env.example README.md "$OUT/"
+          cp -r web/dist "$OUT/web/dist"
+          cp -r tests/fixtures "$OUT/tests/fixtures"
+          cp sbom.cyclonedx.json "$OUT/"
+          echo "${GITHUB_SHA}" > "$OUT/BUILD_SHA"
+          (cd dist && zip -qr "$NAME.zip" "$NAME")
+          sha256sum "dist/$NAME.zip" > "dist/$NAME.zip.sha256"
+          ls -la dist
+      - uses: actions/upload-artifact@v4
+        with:
+          name: release-${{ github.ref_name }}
+          path: |
+            dist/*.zip
+            dist/*.sha256
+            sbom.cyclonedx.json
+      - name: GitHub Release
+        if: github.event_name == 'push'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh release create "${GITHUB_REF_NAME}" dist/*.zip dist/*.sha256 sbom.cyclonedx.json \
+            --title "FinSentinel ${GITHUB_REF_NAME}" --generate-notes --verify-tag
+
+  # Profile B (documented, optional): container image for a Linux host. Enabled by repository
+  # variable CONTAINER_IMAGE=true. Built on the GitHub runner because the dev machine has no Docker.
+  container:
+    needs: verify
+    if: vars.CONTAINER_IMAGE == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ghcr.io/${{ github.repository }}:latest
+
+  # DEP-04: staging mirrors the production profile (NODE_ENV=production, mock gateway, demo seed opt-in).
+  # Runs on the self-hosted Windows runner labelled finsentinel-staging. Enabled by DEPLOY_ENABLED=true.
+  deploy-staging:
+    needs: package
+    if: vars.DEPLOY_ENABLED == 'true'
+    runs-on: [self-hosted, windows, finsentinel-staging]
+    environment:
+      name: staging
+      url: ${{ vars.STAGING_URL || 'http://localhost:3001' }}
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy ${{ github.ref_name }} to staging
+        run: |
+          .\scripts\deploy.ps1 -Environment staging -Ref "${{ github.ref_name }}" `
+            -Repo "${{ github.server_url }}/${{ github.repository }}.git" `
+            -Port ${{ vars.STAGING_PORT || 3001 }} 2>&1 | Tee-Object -FilePath deploy-staging.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deploy-staging-${{ github.run_number }}
+          path: deploy-staging.log
+
+  # DEP-06: the production environment carries "required reviewers"; the job waits for a human
+  # with the ops/committee role to approve. DEP-08..DEP-10 run inside deploy.ps1.
+  deploy-production:
+    needs: deploy-staging
+    if: vars.DEPLOY_ENABLED == 'true' && (github.event_name == 'push' || inputs.environment == 'production')
+    runs-on: [self-hosted, windows, finsentinel-production]
+    environment:
+      name: production
+      url: ${{ vars.PRODUCTION_URL || 'http://localhost:3000' }}
+    defaults:
+      run:
+        shell: powershell
+    steps:
+      - uses: actions/checkout@v4
+      - name: Deploy ${{ github.ref_name }} to production
+        run: |
+          .\scripts\deploy.ps1 -Environment production -Ref "${{ github.ref_name }}" `
+            -Repo "${{ github.server_url }}/${{ github.repository }}.git" `
+            -Port ${{ vars.PRODUCTION_PORT || 3000 }} 2>&1 | Tee-Object -FilePath deploy-production.log
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deploy-production-${{ github.run_number }}
+          path: deploy-production.log

@@ -1,0 +1,28 @@
+{
+  "version": "1.0",
+  "scale": { "min": 1, "max": 5 },
+  "dimensions": [
+    { "key": "product", "label": "Product", "weight": 10, "keywords": ["product", "feature", "complexity", "launch"], "requiredFacts": ["product_description"] },
+    { "key": "customer", "label": "Customer", "weight": 10, "keywords": ["customer", "segment", "SMB", "retail", "commercial", "KYC", "onboarding"], "requiredFacts": ["customer_segment"] },
+    { "key": "geography", "label": "Geography", "weight": 20, "keywords": ["geography", "country", "jurisdiction", "cross-border", "sanctions", "high-risk"], "requiredFacts": ["geographies"] },
+    { "key": "channel", "label": "Channel", "weight": 10, "keywords": ["channel", "API", "mobile", "branch", "digital", "non-face-to-face"], "requiredFacts": ["channel"] },
+    { "key": "transaction", "label": "Transaction", "weight": 20, "keywords": ["transaction", "monitoring", "velocity", "value", "volume", "payments", "instant", "wire"], "requiredFacts": ["transaction_volume", "transaction_value", "monitoring_coverage"] },
+    { "key": "third_party", "label": "Third Party", "weight": 15, "keywords": ["vendor", "third party", "processor", "outsourcing", "due diligence"], "requiredFacts": ["third_party"] },
+    { "key": "technology", "label": "Technology", "weight": 10, "keywords": ["technology", "platform", "integration", "data", "security"], "requiredFacts": ["technology"] },
+    { "key": "process", "label": "Process", "weight": 5, "keywords": ["process", "operational", "manual", "control", "procedure"], "requiredFacts": ["process_change"] }
+  ],
+  "bands": [
+    { "label": "Very Low", "min": 1.0 },
+    { "label": "Low", "min": 1.5 },
+    { "label": "Moderate", "min": 2.5 },
+    { "label": "High", "min": 3.5 },
+    { "label": "Very High", "min": 4.5 }
+  ],
+  "controls": {
+    "ratings": { "none": 0, "weak": 0.3, "adequate": 0.6, "strong": 0.9 },
+    "maxMitigation": 0.5,
+    "floor": 1.0,
+    "maxBandDrop": 2,
+    "unverifiedCountsAs": "none"
+  }
+}

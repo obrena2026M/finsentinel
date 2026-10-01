@@ -1,0 +1,151 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "product_description",
+      "value": "WhatsApp Business conversational channel for balance enquiries, payee management and domestic transfers up to CAD 1,000",
+      "confidence": 0.96,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "enable balance enquiries, payee management and domestic transfers up to CAD 1,000 through a WhatsApp Business conversational channel"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "customer_segment",
+      "value": "existing verified retail (mobile-enrolled)",
+      "confidence": 0.94,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 2,
+          "quote": "Existing retail customers who have completed KYC and enrolled in mobile banking"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Canada"],
+      "confidence": 0.96,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 3, "quote": "Canada only. Domestic transfers to Canadian payees" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "channel",
+      "value": "WhatsApp (new non-face-to-face channel)",
+      "confidence": 0.97,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 4, "quote": "WhatsApp is a new non-face-to-face channel" }],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party",
+      "value": true,
+      "confidence": 0.95,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "Messages are routed through the third-party messaging vendor ChatBridge Inc."
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party_name",
+      "value": "ChatBridge Inc.",
+      "confidence": 0.95,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 4, "quote": "third-party messaging vendor ChatBridge Inc." }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_volume",
+      "value": "25,000 transfers per month",
+      "confidence": 0.95,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 5,
+          "quote": "Expected transaction volume is 25,000 transfers per month"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_value",
+      "value": "maximum CAD 1,000; daily limit CAD 2,000",
+      "confidence": 0.95,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 5,
+          "quote": "Maximum transaction value is CAD 1,000 with a daily limit of CAD 2,000"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_type",
+      "value": "domestic e-transfer",
+      "confidence": 0.95,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 5, "quote": "Transaction type is domestic e-transfer" }],
+      "missing_reason": null
+    },
+    {
+      "field": "controls",
+      "value": ["OTP + conversational PIN authentication", "24-hour payee cooling period"],
+      "confidence": 0.9,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 6, "quote": "Payee additions require a 24-hour cooling period" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "monitoring_coverage",
+      "value": "existing e-transfer scenarios; no channel-specific device/session monitoring yet",
+      "confidence": 0.92,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 6,
+          "quote": "channel-specific device and session monitoring is not yet in place"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "technology",
+      "value": "vendor-routed messaging; OTP to enrolled device",
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "Authentication uses a one-time passcode sent to the enrolled mobile device plus a conversational PIN"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "process_change",
+      "value": "new support escalation path for conversational disputes",
+      "confidence": 0.88,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 7,
+          "quote": "Customer support will receive a new escalation path for conversational channel disputes"
+        }
+      ],
+      "missing_reason": null
+    }
+  ]
+}

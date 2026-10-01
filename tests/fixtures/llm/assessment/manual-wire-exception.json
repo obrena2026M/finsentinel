@@ -1,0 +1,69 @@
+{
+  "summary": "A temporary manual process replaces automated wire exception repair for six months. The key drivers are operator ability to edit beneficiary details before release, single-operator handling below CAD 50,000, cross-border corridors including Mexico, and tracking in a shared spreadsheet. No new customers, channels or third parties are introduced.",
+  "dimensions": [
+    {
+      "dimension": "product",
+      "recommended_score": 2,
+      "narrative": "No product change; existing wire product."
+    },
+    {
+      "dimension": "customer",
+      "recommended_score": 2,
+      "narrative": "Existing retail and commercial wire senders."
+    },
+    {
+      "dimension": "geography",
+      "recommended_score": 3,
+      "narrative": "Existing corridors include Mexico, a higher-risk jurisdiction."
+    },
+    { "dimension": "channel", "recommended_score": 2, "narrative": "No customer channel change." },
+    {
+      "dimension": "transaction",
+      "recommended_score": 3,
+      "narrative": "Repaired wires up to CAD 250,000 re-enter monitoring; beneficiary edits could bypass original screening context."
+    },
+    { "dimension": "third_party", "recommended_score": 1, "narrative": "No third party involved." },
+    {
+      "dimension": "technology",
+      "recommended_score": 3,
+      "narrative": "Shared spreadsheet tracking is a weak control environment."
+    },
+    {
+      "dimension": "process",
+      "recommended_score": 4,
+      "narrative": "Manual beneficiary edits with single-operator release below CAD 50,000 is the main exposure."
+    }
+  ],
+  "claims": [
+    {
+      "dimension": "process",
+      "text": "A material process change may not go live without a completed financial crime risk assessment approved by the Risk Committee.",
+      "citations": [
+        {
+          "cite_source": "AML §4.1",
+          "quote": "without a completed financial crime risk assessment reviewed by an FCRM analyst and approved by the Risk Committee"
+        }
+      ]
+    },
+    {
+      "dimension": "geography",
+      "text": "Cross-border activity to Mexico requires enhanced monitoring.",
+      "citations": [
+        {
+          "cite_source": "AML §5.3",
+          "quote": "Mexico and Brazil are designated higher-risk jurisdictions for cross-border payment products"
+        }
+      ]
+    },
+    {
+      "dimension": "transaction",
+      "text": "Manually repaired cross-border wires to higher-risk jurisdictions still require real-time monitoring.",
+      "citations": [
+        {
+          "cite_source": "TM §7.1",
+          "quote": "Cross-border payments require real-time monitoring for cross-border activity to higher-risk jurisdictions"
+        }
+      ]
+    }
+  ]
+}

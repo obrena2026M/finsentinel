@@ -1,0 +1,65 @@
+{
+  "stage": "01",
+  "name": "Requirements",
+  "date": "2026-09-28",
+  "ai_usage": "Claude Code read the 2,800-line hackathon draft (a testing plan in two variants), reconciled the differences between them, and expanded it into a full PRD with numbered requirement IDs, a permission matrix, traceability tables for all 30 test cases and 10 E2E scenarios, a coverage checklist against every draft section, and 10 open questions with stated assumptions.",
+  "criteria": {
+    "ai_harness": {
+      "done": ["Defined the two-class split (deterministic vs probabilistic) as principles PR-01..PR-08", "Specified agent pipeline and boundaries as requirements FR-ARC-01..06"],
+      "evidence": ["documents/STAGE01_System_Requirements_PRD.md §3, §6"],
+      "decisions": [{ "decision": "Write requirements as IDs, not prose", "reason": "So later stages can trace design, code and tests back to them" }],
+      "gaps": [],
+      "self_score": 4
+    },
+    "sdlc_automation": {
+      "done": ["Stage produced end to end by AI from the draft", "Established the staged workflow and file naming"],
+      "evidence": ["documents/STAGE01_System_Requirements_PRD.md", "logs/token_log.md entry 2"],
+      "decisions": [{ "decision": "Ask which stage every document is for", "reason": "Keeps the six-stage flow explicit rather than ad hoc" }],
+      "gaps": ["No per-stage criteria record existed yet (added retroactively in this file)"],
+      "self_score": 3
+    },
+    "human_in_loop": {
+      "done": ["Four roles and a permission matrix", "Override, rationale, committee decision and audit requirements"],
+      "evidence": ["PRD §4, §5.10, §5.11"],
+      "decisions": [{ "decision": "Committee always required (OQ-04)", "reason": "Hackathon scope; removes an ambiguous analyst-decides path" }],
+      "gaps": [],
+      "self_score": 4
+    },
+    "evaluation": {
+      "done": ["EV-01..10 evaluation requirements, QG-01..14 quality gates, golden dataset spec"],
+      "evidence": ["PRD §8.2, §9"],
+      "decisions": [{ "decision": "Thresholds left as 'agreed threshold' with OQ-03", "reason": "Cannot set numbers before a first run" }],
+      "gaps": ["No numeric thresholds"],
+      "self_score": 3
+    },
+    "context_engineering": {
+      "done": ["Reconciled .txt and .md draft variants (10 vs 5 E2E scenarios, RiskForge naming)", "Listed 10 open questions with assumptions"],
+      "evidence": ["PRD §17, §18"],
+      "decisions": [{ "decision": "Keep all 10 E2E scenarios in scope", "reason": "Superset is safer for a test-driven brief" }],
+      "gaps": ["Domain sources not cited"],
+      "self_score": 4
+    },
+    "production_readiness": {
+      "done": ["NFR-SEC, NFR-OPS, NFR-CI requirements"],
+      "evidence": ["PRD §7"],
+      "decisions": [],
+      "gaps": [],
+      "self_score": 3
+    },
+    "token_efficiency": {
+      "done": ["FR-TOK-01..05 requirements", "Started per-task token logging for the build itself"],
+      "evidence": ["PRD §5.17", "logs/token_log.md"],
+      "decisions": [{ "decision": "Log build tokens per task from the session transcript", "reason": "Token efficiency is judged; the build's own consumption is evidence" }],
+      "gaps": [],
+      "self_score": 4
+    },
+    "engineering_judgement": {
+      "done": ["PR-08 separation: LLM for extraction/retrieval/synthesis/drafting; rules for scoring/validation/permissions/workflow; humans for decisions"],
+      "evidence": ["PRD §3"],
+      "decisions": [],
+      "gaps": [],
+      "self_score": 4
+    }
+  },
+  "tokens": { "task_ids": [1, 2], "output": 49736, "cache_read": 582142, "cache_write": 272537, "subagents": 0 }
+}

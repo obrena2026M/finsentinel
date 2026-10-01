@@ -1,0 +1,18 @@
+{
+  "VsCodeTaskButtons.showCounter": false,
+  "VsCodeTaskButtons.tasks": [
+    { "label": "$(play) Start", "task": "FinSentinel: Start app (API + web on :3000)", "tooltip": "Build web + start FinSentinel on http://localhost:3000" },
+    { "label": "$(debug-restart) Dev", "task": "FinSentinel: Dev (API + Web)", "tooltip": "API watch + Vite HMR" },
+    { "label": "$(beaker) Test", "task": "FinSentinel: Test (unit/integration/security/adversarial)", "tooltip": "npm test" },
+    { "label": "$(shield) Coverage", "task": "FinSentinel: Test with coverage (c8)", "tooltip": "c8 thresholds enforced" },
+    { "label": "$(browser) E2E", "task": "FinSentinel: Test e2e (Chromium, light + dark)", "tooltip": "Chromium walkthrough" },
+    { "label": "$(graph) Eval", "task": "FinSentinel: Evaluation (golden dataset, mock)", "tooltip": "Golden dataset evaluation" },
+    { "label": "$(verified) Gate", "task": "FinSentinel: Quality gate", "tooltip": "Release gate PASS/FAIL" },
+    { "label": "$(notebook) Report", "task": "FinSentinel: Criteria report (FINAL_REPORT.md)", "tooltip": "Regenerate FINAL_REPORT.md" }
+  ],
+  "biome.enabled": true,
+  "editor.defaultFormatter": "biomejs.biome",
+  "editor.formatOnSave": true,
+  "[json]": { "editor.defaultFormatter": "biomejs.biome" },
+  "files.eol": "\n"
+}

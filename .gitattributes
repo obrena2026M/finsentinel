@@ -1,0 +1,9 @@
+# DEP-01: one line-ending convention for the Windows dev machine, the Ubuntu CI runner and the Windows deploy host.
+* text=auto eol=lf
+*.ps1 text eol=crlf
+*.cmd text eol=crlf
+*.png binary
+*.pdf binary
+*.db binary
+*.docx binary
+*.xlsx binary

@@ -1,0 +1,79 @@
+{
+  "summary": "Admitting money service businesses reverses a policy exclusion for a segment that is cash-intensive, high-velocity and remits globally including to higher-risk jurisdictions. Existing monitoring scenarios do not cover this activity and a dedicated scenario set is only planned. Enhanced due diligence and quarterly agent reviews are proposed but not yet operational.",
+  "dimensions": [
+    {
+      "dimension": "product",
+      "recommended_score": 3,
+      "narrative": "Existing account product for a very different usage profile."
+    },
+    {
+      "dimension": "customer",
+      "recommended_score": 5,
+      "narrative": "MSBs are a policy-excluded, inherently higher-risk segment."
+    },
+    {
+      "dimension": "geography",
+      "recommended_score": 4,
+      "narrative": "Global remittance including higher-risk destinations."
+    },
+    { "dimension": "channel", "recommended_score": 2, "narrative": "Branch and relationship manager." },
+    {
+      "dimension": "transaction",
+      "recommended_score": 5,
+      "narrative": "Cash deposits and wires at high velocity with no covering scenario."
+    },
+    {
+      "dimension": "third_party",
+      "recommended_score": 1,
+      "narrative": "No third party is involved in this change."
+    },
+    { "dimension": "technology", "recommended_score": 1, "narrative": "No technology change is proposed." },
+    {
+      "dimension": "process",
+      "recommended_score": 3,
+      "narrative": "New licensing verification and quarterly agent reviews."
+    }
+  ],
+  "claims": [
+    {
+      "dimension": "transaction",
+      "text": "Monitoring coverage must be mapped before launch; partial coverage needs a compensating control and committee condition.",
+      "citations": [
+        {
+          "cite_source": "TM §3.1",
+          "quote": "may not launch without an approved compensating control and a committee condition"
+        }
+      ]
+    },
+    {
+      "dimension": "customer",
+      "text": "Business customers require verification of nature of business, expected activity and beneficial owners.",
+      "citations": [
+        {
+          "cite_source": "KYC §2.1",
+          "quote": "verification of legal existence, nature of business, expected activity and beneficial owners"
+        }
+      ]
+    },
+    {
+      "dimension": "customer",
+      "text": "SMB customers present elevated risk where the business handles cash-intensive or cross-border activity.",
+      "citations": [
+        {
+          "cite_source": "AML §3.2",
+          "quote": "where the business handles cash-intensive or cross-border activity"
+        }
+      ]
+    },
+    {
+      "dimension": "product",
+      "text": "Controls may reduce residual risk but do not eliminate inherent risk.",
+      "citations": [
+        {
+          "cite_source": "AML §2.1",
+          "quote": "Controls may reduce residual risk but do not eliminate inherent risk"
+        }
+      ]
+    }
+  ]
+}

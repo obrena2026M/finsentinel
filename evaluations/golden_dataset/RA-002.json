@@ -1,0 +1,30 @@
+{
+  "case_id": "RA-002",
+  "category": "low_risk",
+  "title": "Savings Goal feature in mobile app",
+  "change_type": "feature",
+  "description": "Add a Savings Goal feature to the existing mobile banking app letting existing retail customers schedule automatic transfers between their own chequing and savings accounts. Canada only, no third party.",
+  "documents": [{ "kind": "product_proposal", "file": "RA-LOW/product_proposal.md" }],
+  "expected_facts": {
+    "channel": "mobile",
+    "third_party": false,
+    "geographies": ["Canada"],
+    "transaction_volume": "40,000 transfers per month"
+  },
+  "expected_missing": [],
+  "expected_contradictions": [],
+  "expected_dimensions": ["product", "customer", "transaction", "channel"],
+  "expected_evidence": [
+    "AML §2.1",
+    "AML §4.1",
+    "AML §6.1",
+    "TM §1.1",
+    "TM §3.1",
+    "TM §4.2",
+    "KYC §2.1",
+    "KYC §3.3",
+    "KYC §6.2"
+  ],
+  "expected_band": ["Very Low", "Low"],
+  "adversarial": null
+}

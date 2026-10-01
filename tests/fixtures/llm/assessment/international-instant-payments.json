@@ -1,0 +1,115 @@
+{
+  "summary": "The change introduces cross-border instant payments for existing SMB customers via the API channel, executed by the third-party processor PayRail. Key drivers are the Mexico corridor (a designated higher-risk jurisdiction), instant settlement that removes recall ability, partial transaction monitoring coverage, an unverified vendor compliance program, and a contradiction between the proposal and the vendor on geographic coverage (Brazil) and on who performs monitoring. Expected transaction volume is missing and should be obtained before launch.",
+  "dimensions": [
+    {
+      "dimension": "product",
+      "recommended_score": 3,
+      "narrative": "New cross-border instant payment product built on an existing account relationship; complexity is moderate and driven by the third-party execution model."
+    },
+    {
+      "dimension": "customer",
+      "recommended_score": 3,
+      "narrative": "Existing SMB base only, but SMB customers gaining cross-border activity fall within enhanced due diligence expectations."
+    },
+    {
+      "dimension": "geography",
+      "recommended_score": 4,
+      "narrative": "Mexico is a designated higher-risk jurisdiction for cross-border payments, and the vendor questionnaire indicates Brazil coverage that the proposal does not include."
+    },
+    {
+      "dimension": "channel",
+      "recommended_score": 3,
+      "narrative": "Public API is a non-face-to-face channel; existing OAuth credentials mitigate but behavioural monitoring proportional to value is required."
+    },
+    {
+      "dimension": "transaction",
+      "recommended_score": 4,
+      "narrative": "Instant settlement up to USD 25,000 with only partial monitoring coverage (domestic wire scenarios) and unknown volume."
+    },
+    {
+      "dimension": "third_party",
+      "recommended_score": 4,
+      "narrative": "PayRail performs payout, FX and beneficiary screening; its controls are self-asserted and untested, and a Brazil partner network introduces fourth parties."
+    },
+    {
+      "dimension": "technology",
+      "recommended_score": 2,
+      "narrative": "Integration reuses existing API gateway and OAuth; limited new technology risk."
+    },
+    {
+      "dimension": "process",
+      "recommended_score": 2,
+      "narrative": "Manual exception handling for failed payouts for three months is a temporary operational exposure."
+    }
+  ],
+  "claims": [
+    {
+      "dimension": "geography",
+      "text": "Mexico is designated a higher-risk jurisdiction for cross-border payment products, requiring enhanced due diligence and enhanced monitoring.",
+      "citations": [
+        {
+          "cite_source": "AML §5.3",
+          "quote": "Mexico and Brazil are designated higher-risk jurisdictions for cross-border payment products"
+        }
+      ]
+    },
+    {
+      "dimension": "transaction",
+      "text": "Instant settlement increases exposure because funds cannot be recalled once settled.",
+      "citations": [
+        {
+          "cite_source": "AML §5.4",
+          "quote": "Instant settlement increases exposure because funds cannot be recalled once settled"
+        }
+      ]
+    },
+    {
+      "dimension": "transaction",
+      "text": "Partial monitoring coverage is not acceptable for launch without a compensating control and a committee condition.",
+      "citations": [
+        {
+          "cite_source": "TM §3.1",
+          "quote": "Products with partial or unconfirmed coverage may not launch without an approved compensating control and a committee condition"
+        }
+      ]
+    },
+    {
+      "dimension": "transaction",
+      "text": "Cross-border SMB payments require real-time monitoring for activity to higher-risk jurisdictions.",
+      "citations": [
+        {
+          "cite_source": "TM §7.1",
+          "quote": "Cross-border payments require real-time monitoring for cross-border activity to higher-risk jurisdictions"
+        }
+      ]
+    },
+    {
+      "dimension": "third_party",
+      "text": "The vendor's self-assessment is not evidence of sanctions control effectiveness; the Bank must test the processor's screening before launch.",
+      "citations": [
+        {
+          "cite_source": "SANCTIONS §4.3",
+          "quote": "A vendor's self-assessment or questionnaire response is not evidence of control effectiveness"
+        }
+      ]
+    },
+    { "dimension": "third_party", "text": "Vendor has strong sanctions controls.", "citations": [] },
+    {
+      "dimension": "customer",
+      "text": "SMB customers with cross-border payment activity to higher-risk jurisdictions require enhanced due diligence before the activity is enabled.",
+      "citations": [
+        {
+          "cite_source": "KYC §4.1",
+          "quote": "SMB customers with cross-border payment activity to higher-risk jurisdictions"
+        }
+      ]
+    },
+    {
+      "dimension": "channel",
+      "text": "API channels require identity verification at onboarding and behavioural monitoring proportional to transaction value.",
+      "citations": [
+        { "cite_source": "AML §6.1", "quote": "behavioural monitoring proportional to transaction value" }
+      ]
+    }
+  ]
+}

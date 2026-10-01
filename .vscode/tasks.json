@@ -1,0 +1,79 @@
+{
+  "version": "2.0.0",
+  "options": {
+    "env": { "NODE_USE_SYSTEM_CA": "1" },
+    "shell": { "executable": "powershell.exe", "args": ["-NoProfile", "-ExecutionPolicy", "Bypass", "-Command"] }
+  },
+  "presentation": { "reveal": "always", "panel": "dedicated", "clear": true },
+  "tasks": [
+    {
+      "label": "FinSentinel: Start app (API + web on :3000)",
+      "type": "shell",
+      "command": "npm run build; npm start",
+      "isBackground": true,
+      "problemMatcher": {
+        "pattern": { "regexp": "^$" },
+        "background": { "activeOnStart": true, "beginsPattern": "building client", "endsPattern": "FinSentinel listening" }
+      },
+      "group": { "kind": "build", "isDefault": true },
+      "detail": "Builds the React app, then starts the Fastify server with .env (mock LLM gateway, seeds demo cases on first run). Open http://localhost:3000"
+    },
+    {
+      "label": "FinSentinel: Dev API (watch, :3000)",
+      "type": "shell",
+      "command": "npm run dev:api",
+      "isBackground": true,
+      "problemMatcher": { "pattern": { "regexp": "^$" }, "background": { "activeOnStart": true, "beginsPattern": ".", "endsPattern": "FinSentinel listening" } },
+      "detail": "node --watch src/server.ts — restarts on server code changes"
+    },
+    {
+      "label": "FinSentinel: Dev Web (Vite, :5173)",
+      "type": "shell",
+      "command": "npm run dev:web",
+      "isBackground": true,
+      "problemMatcher": { "pattern": { "regexp": "^$" }, "background": { "activeOnStart": true, "beginsPattern": ".", "endsPattern": "Local:" } },
+      "detail": "Vite dev server with HMR, proxies /api to :3000. Open http://localhost:5173"
+    },
+    {
+      "label": "FinSentinel: Dev (API + Web)",
+      "dependsOn": ["FinSentinel: Dev API (watch, :3000)", "FinSentinel: Dev Web (Vite, :5173)"],
+      "dependsOrder": "parallel",
+      "problemMatcher": [],
+      "detail": "Runs both dev servers side by side"
+    },
+    { "label": "FinSentinel: Build web", "type": "shell", "command": "npm run build", "problemMatcher": [] },
+    { "label": "FinSentinel: Lint + typecheck", "type": "shell", "command": "npm run lint; npm run typecheck", "problemMatcher": ["$tsc"], "group": "test" },
+    { "label": "FinSentinel: Test (unit/integration/security/adversarial)", "type": "shell", "command": "npm test", "problemMatcher": [], "group": { "kind": "test", "isDefault": true } },
+    { "label": "FinSentinel: Test with coverage (c8)", "type": "shell", "command": "npm run test:coverage", "problemMatcher": [], "group": "test" },
+    { "label": "FinSentinel: Test e2e (Chromium, light + dark)", "type": "shell", "command": "npm run test:e2e", "problemMatcher": [], "group": "test" },
+    { "label": "FinSentinel: Show test report (HTML)", "type": "shell", "command": "npx playwright show-report", "problemMatcher": [] },
+    { "label": "FinSentinel: Evaluation (golden dataset, mock)", "type": "shell", "command": "npm run eval", "problemMatcher": [] },
+    { "label": "FinSentinel: Quality gate", "type": "shell", "command": "npm run gate", "problemMatcher": [] },
+    {
+      "label": "FinSentinel: Full verification (lint → typecheck → coverage → e2e → eval → gate)",
+      "type": "shell",
+      "command": "npm run lint; npm run typecheck; npm run test:coverage; npm run test:e2e; npm run eval; npm run gate",
+      "problemMatcher": [],
+      "group": "test"
+    },
+    { "label": "FinSentinel: Criteria report (FINAL_REPORT.md)", "type": "shell", "command": "npm run criteria:report", "problemMatcher": [] },
+    { "label": "FinSentinel: Token report", "type": "shell", "command": "powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\token_report.ps1", "problemMatcher": [] },
+    { "label": "FinSentinel: Seed demo cases", "type": "shell", "command": "npm run seed", "problemMatcher": [] },
+    { "label": "FinSentinel: Backup database", "type": "shell", "command": "npm run backup", "problemMatcher": [] },
+    {
+      "label": "FinSentinel: Reset local database",
+      "type": "shell",
+      "command": "Remove-Item -Force -ErrorAction SilentlyContinue data\\finsentinel.db, data\\finsentinel.db-wal, data\\finsentinel.db-shm; Remove-Item -Recurse -Force -ErrorAction SilentlyContinue data\\uploads; Write-Host 'Local database and uploads removed. Start the app to reseed.'",
+      "problemMatcher": [],
+      "detail": "Deletes data/finsentinel.db and uploads so the next start reseeds RA-1001 / RA-1002"
+    },
+    {
+      "label": "Launch Claude CLI",
+      "type": "shell",
+      "command": "C:\\Users\\OFBrena\\.local\\bin\\claude.exe",
+      "presentation": { "reveal": "always", "focus": true, "panel": "dedicated", "clear": false },
+      "problemMatcher": [],
+      "detail": "Opens an interactive Claude Code session in a dedicated terminal"
+    }
+  ]
+}

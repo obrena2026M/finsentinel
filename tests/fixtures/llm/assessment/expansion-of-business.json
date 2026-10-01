@@ -1,0 +1,71 @@
+{
+  "summary": "Offering operating accounts to Mexican-incorporated SMBs introduces a higher-risk jurisdiction as an operating geography with large wire values (up to CAD 500,000) and beneficial owners across three countries. Existing cross-border scenarios apply but no Mexico-specific monitoring exists. Enhanced due diligence is planned.",
+  "dimensions": [
+    {
+      "dimension": "product",
+      "recommended_score": 3,
+      "narrative": "Existing account product extended to a new jurisdiction."
+    },
+    {
+      "dimension": "customer",
+      "recommended_score": 3,
+      "narrative": "SMB customers with foreign incorporation and multi-country ownership."
+    },
+    {
+      "dimension": "geography",
+      "recommended_score": 5,
+      "narrative": "Mexico becomes an operating geography, not just a payment destination."
+    },
+    {
+      "dimension": "channel",
+      "recommended_score": 2,
+      "narrative": "Relationship manager channel with in-person verification."
+    },
+    {
+      "dimension": "transaction",
+      "recommended_score": 4,
+      "narrative": "High-value wires without a Mexico-specific scenario."
+    },
+    { "dimension": "third_party", "recommended_score": 2, "narrative": "Existing correspondent only." },
+    { "dimension": "technology", "recommended_score": 1, "narrative": "No technology change." },
+    {
+      "dimension": "process",
+      "recommended_score": 2,
+      "narrative": "Bilingual document review by two staff is a capacity constraint."
+    }
+  ],
+  "claims": [
+    {
+      "dimension": "geography",
+      "text": "Mexico is designated higher-risk and requires enhanced due diligence and enhanced monitoring.",
+      "citations": [
+        {
+          "cite_source": "AML §5.3",
+          "quote": "requires enhanced due diligence and enhanced transaction monitoring"
+        }
+      ]
+    },
+    {
+      "dimension": "transaction",
+      "text": "Cross-border wires to higher-risk jurisdictions require real-time monitoring including destination-country risk scoring.",
+      "citations": [{ "cite_source": "TM §7.1", "quote": "including destination-country risk scoring" }]
+    },
+    {
+      "dimension": "customer",
+      "text": "SMB customers with cross-border activity to higher-risk jurisdictions require enhanced due diligence before the activity is enabled.",
+      "citations": [
+        { "cite_source": "KYC §4.1", "quote": "must be completed before the higher-risk activity is enabled" }
+      ]
+    },
+    {
+      "dimension": "product",
+      "text": "Controls may reduce residual risk but do not eliminate inherent risk.",
+      "citations": [
+        {
+          "cite_source": "AML §2.1",
+          "quote": "Controls may reduce residual risk but do not eliminate inherent risk"
+        }
+      ]
+    }
+  ]
+}

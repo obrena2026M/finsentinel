@@ -1,0 +1,125 @@
+{
+  "doc_id": "DOC",
+  "instruction_like_content_detected": false,
+  "facts": [
+    {
+      "field": "product_description",
+      "value": "Retail e-transfer daily limit CAD 3,000 → 10,000 and per-transaction CAD 3,000 → 5,000 for tenured customers",
+      "confidence": 0.96,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 1,
+          "quote": "increase the retail e-transfer daily limit from CAD 3,000 to CAD 10,000"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "customer_segment",
+      "value": "existing retail with 12 months tenure and no fraud flags (~60%)",
+      "confidence": 0.94,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 2, "quote": "Approximately 60 percent of the retail base qualifies" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "geographies",
+      "value": ["Canada"],
+      "confidence": 0.96,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 3, "quote": "Canada only. Domestic e-transfers" }],
+      "missing_reason": null
+    },
+    {
+      "field": "channel",
+      "value": "mobile and web (existing)",
+      "confidence": 0.95,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 4, "quote": "Existing mobile and web channels" }],
+      "missing_reason": null
+    },
+    {
+      "field": "third_party",
+      "value": false,
+      "confidence": 0.96,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 4, "quote": "No third party is involved" }],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_volume",
+      "value": "1.2 million e-transfers per month (unchanged)",
+      "confidence": 0.95,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 5,
+          "quote": "Expected transaction volume is unchanged at 1.2 million e-transfers per month"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_value",
+      "value": "average CAD 410 → 620; maximum CAD 5,000",
+      "confidence": 0.95,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 5, "quote": "Maximum transaction value becomes CAD 5,000" }],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_velocity",
+      "value": "10 transfers per day (unchanged)",
+      "confidence": 0.93,
+      "sources": [
+        { "doc_id": "DOC", "chunk_ix": 6, "quote": "Velocity limits remain at 10 transfers per day" }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "transaction_type",
+      "value": "domestic e-transfer",
+      "confidence": 0.95,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 5, "quote": "Transaction type is domestic e-transfer" }],
+      "missing_reason": null
+    },
+    {
+      "field": "controls",
+      "value": ["velocity limits", "90-day fraud operations monitoring"],
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 7,
+          "quote": "Fraud operations will monitor the first 90 days with a weekly report"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "monitoring_coverage",
+      "value": "existing e-transfer scenarios tuned to CAD 3,000; re-tuning required",
+      "confidence": 0.93,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 6, "quote": "their thresholds will need re-tuning" }],
+      "missing_reason": null
+    },
+    {
+      "field": "technology",
+      "value": "limit-eligibility rule in existing payments engine",
+      "confidence": 0.9,
+      "sources": [
+        {
+          "doc_id": "DOC",
+          "chunk_ix": 4,
+          "quote": "A limit-eligibility rule will be added to the existing payments engine"
+        }
+      ],
+      "missing_reason": null
+    },
+    {
+      "field": "process_change",
+      "value": "none",
+      "confidence": 0.9,
+      "sources": [{ "doc_id": "DOC", "chunk_ix": 7, "quote": "No operational process change" }],
+      "missing_reason": null
+    }
+  ]
+}

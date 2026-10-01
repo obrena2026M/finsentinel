@@ -1,0 +1,26 @@
+{
+  "recommendations": [
+    "ms-playwright.playwright",
+    "anthropic.claude-code",
+    "biomejs.biome",
+    "qwtel.sqlite-viewer",
+    "humao.rest-client",
+    "mikestead.dotenv",
+    "usernamehw.errorlens",
+    "christian-kohler.npm-intellisense",
+    "christian-kohler.path-intellisense",
+    "eamodio.gitlens",
+    "github.vscode-github-actions",
+    "github.vscode-pull-request-github",
+    "yzhang.markdown-all-in-one",
+    "bierner.markdown-mermaid",
+    "streetsidesoftware.code-spell-checker",
+    "editorconfig.editorconfig"
+  ],
+  "unwantedRecommendations": [
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode",
+    "vitest.explorer",
+    "ms-azuretools.vscode-docker"
+  ]
+}
