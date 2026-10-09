@@ -1,0 +1,251 @@
+<!doctype html><html lang="en" data-theme="light"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>1. Design principles</title><style>
+:root{--bg:#f6f8fc;--panel:#fff;--panel2:#f0f4fb;--text:#182230;--muted:#65748b;--line:#dce3ee;--blue:#2563eb;--cyan:#0891b2;--violet:#7c3aed;--green:#059669;--amber:#d97706;--red:#dc2626;--shadow:0 14px 40px rgba(30,52,90,.09);--mono:#0b1220;--monoText:#d7e7ff}html[data-theme=dark]{--bg:#07111f;--panel:#0e1b2d;--panel2:#14243a;--text:#e7eef8;--muted:#9bacbf;--line:#283b55;--blue:#78a9ff;--cyan:#4dd4ed;--violet:#b596ff;--green:#42d3a0;--amber:#ffbd66;--red:#ff7c82;--shadow:0 18px 50px rgba(0,0,0,.32);--mono:#040912;--monoText:#d7e7ff}*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 90% 0,color-mix(in srgb,var(--blue) 8%,transparent),transparent 28%),var(--bg);color:var(--text);font:15px/1.65 Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif}.progress{position:fixed;z-index:50;left:0;top:0;height:3px;background:linear-gradient(90deg,var(--cyan),var(--blue),var(--violet));width:0}.top{position:fixed;z-index:40;top:3px;left:0;right:0;height:65px;display:flex;align-items:center;gap:10px;padding:0 20px;background:color-mix(in srgb,var(--panel) 90%,transparent);border-bottom:1px solid var(--line);backdrop-filter:blur(18px)}button,input{font:inherit}.logo{display:flex;gap:10px;align-items:center;font-weight:850;letter-spacing:-.02em}.logo b{display:grid;place-items:center;width:31px;height:31px;border-radius:9px;color:white;background:linear-gradient(145deg,var(--cyan),var(--blue))}.pill{font-size:11px;font-weight:800;letter-spacing:.08em;color:var(--blue);background:var(--panel2);padding:5px 9px;border-radius:999px}.grow{flex:1}.search{width:min(420px,38vw);padding:10px 13px;border:1px solid var(--line);border-radius:11px;background:var(--panel2);color:var(--text);outline:none}.search:focus{border-color:var(--blue);box-shadow:0 0 0 3px color-mix(in srgb,var(--blue) 18%,transparent)}button{border:1px solid var(--line);color:var(--text);background:var(--panel);padding:9px 11px;border-radius:10px;cursor:pointer}button:hover{border-color:var(--blue);color:var(--blue)}.shell{display:grid;grid-template-columns:300px minmax(0,1fr);padding-top:68px}.side{position:fixed;top:68px;bottom:0;width:300px;padding:22px 14px;overflow:auto;background:color-mix(in srgb,var(--panel) 96%,transparent);border-right:1px solid var(--line)}.side-title{margin:0 9px 12px;color:var(--muted);font-size:11px;font-weight:800;text-transform:uppercase;letter-spacing:.13em}.toc a{display:flex;gap:8px;align-items:flex-start;padding:8px 10px;margin:2px 0;border-radius:9px;color:var(--muted);text-decoration:none;font-size:13px;line-height:1.35}.toc a:before{content:'';width:5px;height:5px;border-radius:50%;background:var(--line);margin-top:6px;flex:0 0 auto}.toc a:hover,.toc a.active{color:var(--blue);background:var(--panel2)}.toc a.active:before{background:var(--blue)}.side-actions{display:flex;gap:7px;margin:18px 8px}.side-actions button{font-size:12px;padding:7px 8px}.content{grid-column:2;width:100%;max-width:1450px;padding:38px clamp(22px,5vw,74px) 90px}.hero{position:relative;overflow:hidden;padding:34px;border:1px solid var(--line);border-radius:22px;background:linear-gradient(135deg,var(--panel),var(--panel2));box-shadow:var(--shadow);margin-bottom:25px}.hero:after{content:'';position:absolute;width:250px;height:250px;right:-90px;top:-120px;border-radius:50%;background:linear-gradient(145deg,var(--cyan),var(--violet));opacity:.16}.eyebrow{color:var(--blue);font-size:12px;font-weight:850;letter-spacing:.12em;text-transform:uppercase}.hero h1{position:relative;z-index:1;font-size:clamp(30px,4vw,48px);line-height:1.08;letter-spacing:-.045em;margin:7px 0 10px;max-width:900px}.hero p{position:relative;z-index:1;color:var(--muted);margin:0;max-width:760px}.stats{display:flex;flex-wrap:wrap;gap:9px;margin-top:20px}.stat{padding:7px 11px;border-radius:9px;border:1px solid var(--line);background:color-mix(in srgb,var(--panel) 75%,transparent);font-size:12px;font-weight:700}.card{border:1px solid var(--line);border-radius:17px;background:var(--panel);box-shadow:var(--shadow);margin:0 0 18px;overflow:hidden}.cardhead{display:flex;align-items:center;gap:12px;padding:18px 22px;cursor:pointer}.num{display:grid;place-items:center;min-width:30px;height:30px;border-radius:9px;background:var(--panel2);color:var(--blue);font-size:12px;font-weight:900}.cardhead h2{margin:0;font-size:22px;line-height:1.25;letter-spacing:-.02em}.chev{margin-left:auto;color:var(--muted);transition:.2s}.card.closed .body{display:none}.card.closed .chev{transform:rotate(-90deg)}.body{padding:0 22px 26px;overflow-wrap:anywhere}.body h4,.body h5{color:var(--blue);margin:27px 0 10px}.body h4{font-size:17px}.body h5{font-size:15px}.body>p:first-child{margin-top:2px}.body a{color:var(--blue)}table{display:block;overflow:auto;width:100%;border-collapse:separate;border-spacing:0;border:1px solid var(--line);border-radius:12px;margin:16px 0;background:var(--panel)}th,td{padding:10px 12px;text-align:left;vertical-align:top;border-right:1px solid var(--line);border-bottom:1px solid var(--line);min-width:105px}th{position:sticky;top:0;background:var(--panel2);font-size:12px;text-transform:uppercase;letter-spacing:.035em;color:var(--muted)}tr:last-child td{border-bottom:0}th:last-child,td:last-child{border-right:0}tbody tr:hover td{background:color-mix(in srgb,var(--blue) 5%,var(--panel))}pre{position:relative;padding:20px;border-radius:13px;background:var(--mono);color:var(--monoText);overflow:auto;white-space:pre-wrap;font-size:13px;border:1px solid color-mix(in srgb,var(--blue) 20%,transparent)}code{font-family:"Cascadia Code",Consolas,monospace;font-size:.9em}.copy{position:absolute;right:8px;top:8px;border-color:#34445d;background:#15233a;color:#fff;font-size:11px;padding:5px 8px}.body>p:not(:has(strong))+p{}ul,ol{padding-left:23px}li{margin:5px 0}strong{font-weight:760}.empty{display:none;text-align:center;padding:50px;color:var(--muted)}mark{background:#ffe067;color:#182230;border-radius:3px;padding:0 2px}.topbtn{position:fixed;right:22px;bottom:22px;display:none;z-index:30}.mobile{display:none}@media(max-width:880px){.mobile{display:block}.pill{display:none}.shell{display:block}.side{transform:translateX(-105%);z-index:35;transition:.22s;box-shadow:var(--shadow)}.side.open{transform:none}.content{padding:25px 13px 70px}.logo span{display:none}.search{width:38vw}.hero{padding:25px}.cardhead{padding:16px}.body{padding:0 16px 21px}}@media print{.top,.side,.progress,.copy,.topbtn{display:none!important}.shell{display:block;padding:0}.content{padding:0;max-width:none}.hero,.card{box-shadow:none}.card.closed .body{display:block}.card{break-inside:auto}body{background:#fff;color:#111}}
+</style></head><body><div class="progress"></div><header class="top"><button class="mobile" aria-label="Menu">☰</button><div class="logo"><b>F</b><span>FinSentinel Docs</span></div><span class="pill">STAGE02</span><span class="grow"></span><input class="search" type="search" placeholder="Search sections..." aria-label="Search document"><button id="theme" title="Theme">◐</button><button onclick="print()">Print</button></header><div class="shell"><aside class="side"><p class="side-title">On this page</p><nav class="toc"><a href="#4-1-sign-in-role-tiles-simulation-no-password">4.1 Sign in — role tiles (simulation, no password)</a><a href="#4-1a-theme-light-and-dark">4.1a Theme — light and dark</a><a href="#4-2-case-list">4.2 Case list</a><a href="#4-3-create-case-product-owner">4.3 Create case (Product Owner)</a><a href="#4-4-case-workspace-overview">4.4 Case workspace — Overview</a><a href="#4-5-facts-tab">4.5 Facts tab</a><a href="#4-6-evidence-tab">4.6 Evidence tab</a><a href="#4-7-assessment-tab">4.7 Assessment tab</a><a href="#4-8-risk-tab-the-demo-centrepiece">4.8 Risk tab — the demo centrepiece</a><a href="#4-9-committee-tab">4.9 Committee tab</a><a href="#4-10-history-tab">4.10 History tab</a><a href="#4-11-finsentinel-quality-center-quality">4.11 FinSentinel Quality Center (/quality)</a><a href="#4-12-operations-dashboard-ops">4.12 Operations dashboard (/ops)</a><a href="#4-13-admin-risk-model-admin-risk-model">4.13 Admin — Risk model (/admin/risk-model)</a></nav><div class="side-actions"><button id="expand">Expand all</button><button id="collapse">Collapse all</button></div></aside><main class="content"><section class="hero"><div class="eyebrow">EXPERIENCE DESIGN</div><h1>1. Design principles</h1><p>Interactive technical documentation designed for fast navigation, review, and presentation.</p><div class="stats"><span class="stat">15 sections</span><span class="stat">Searchable</span><span class="stat">Print ready</span><span class="stat">Offline friendly</span></div></section><section class="card"><div class="cardhead"><span class="num">00</span><h2>Document Overview</h2><span class="chev">▾</span></div><div class="body"><h1>FinSentinel — User Experience Design</h1>
+<p><em>FinSentinel — Financial Crime Risk Assessment Workbench</em></p>
+<p>| Field | Value | |---|---| | Stage | <strong>STAGE02 — Design</strong> (document 3 of 3: UX) | | Companion docs | <code>STAGE02_Design_Architecture.md</code>, <code>STAGE02_Design_Data_Model.md</code> | | Version | 1.0 (2026-09-28) |</p>
+<p>Design goal: the UI must make the three layers visible at all times — what the <strong>AI prepared</strong>, what the <strong>rules calculated</strong>, and what the <strong>human decided</strong>. Every AI output is labelled, every calculated number is explainable, every human action needs a reason.</p>
+<p>---</p>
+<h2>1. Design principles</h2>
+<p>| # | Principle | Implementation | |---|---|---| | U1 | Three-column truth | Every dimension row shows AI recommendation · Calculated · Human override side by side (UX-01). | | U2 | Evidence one click away | Every fact, claim and evidence reference opens the source snippet in a side panel. | | U3 | Warnings are blockers, not decorations | Missing info, contradictions, unsupported claims and low-confidence facts appear in a <strong>Blockers</strong> rail and disable Finalize until cleared (UX-02/03). | | U4 | Rationale is a form field, not a comment | Override, resolve, accept-gap and decision dialogs cannot submit with an empty rationale (UX-04). | | U5 | Failure is a state, not a toast | LLM failure renders an inline failure card with "Continue manually"; nothing disappears (UX-07). | | U6 | Role-appropriate surfaces | Navigation and actions are filtered by role; forbidden actions are absent, not greyed. | | U7 | Demo-first density | Screens are designed to be read on a projector: large status chips, few colours, no dense tables without headers. |</p>
+<p>---</p>
+<h2>2. Information architecture</h2>
+<pre><code>/signin                         Role tiles / user picker (no password)
+/cases                          Case list (all roles; filtered)
+/cases/new                      Create case (Product Owner)
+/cases/:id                      Case workspace
+   ├─ #overview                 Status, pipeline, blockers
+   ├─ #facts                    Extracted facts, missing, contradictions
+   ├─ #evidence                 Retrieved policy sections + document chunks
+   ├─ #assessment               AI narrative, claims with verdicts
+   ├─ #risk                     Dimension table, inherent/residual, overrides, controls
+   ├─ #committee                Packet + decision (Committee), read-only otherwise
+   └─ #history                  Audit timeline + integrity check
+/quality                        FinSentinel Quality Center
+/ops                            Operations dashboard
+/admin/risk-model               Risk model editor (Admin)</code></pre>
+<p>Global shell: top bar (product name, role badge, user menu with <strong>Switch user</strong>, theme toggle ☀/☾), left nav (Cases, Quality Center, Ops, Admin if role), main content, right <strong>context panel</strong> (evidence viewer / blockers).</p>
+<p>---</p>
+<h2>3. Personas and journeys</h2>
+<p>All journeys start at <code>/signin</code> by selecting a role tile.</p>
+<p>| Role | Primary journey | Screens | |---|---|---| | Product Owner | Create case → upload docs → watch pipeline → answer information requests → see decision | /cases/new, /cases/:id overview + facts | | FCRM Analyst | Open case → clear blockers → challenge AI → set controls → override with rationale → finalize | /cases/:id all tabs | | Risk Committee | Open packet → review evidence &amp; overrides → decide with rationale/conditions | /cases/:id committee, history | | FCRM Admin | Publish risk model version → view Quality Center | /admin/risk-model, /quality |</p>
+<p>---</p>
+<h2>4. Screens</h2>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-1-sign-in-role-tiles-simulation-no-password">4.1 Sign in — role tiles (simulation, no password)</h2><span class="chev">▾</span></div><div class="body">
+<p>This is a simulation with synthetic users. Sign-in is a <strong>user picker</strong>, not an authentication challenge. Selecting a tile creates a server session for that user and role; all RBAC rules (Architecture §9.2) then apply exactly as they would after a real login. Password is not required and no password field is shown. The session-cookie mechanism is unchanged, so swapping in real authentication later is a change to this one screen and one route.</p>
+<pre><code>┌──────────────────────────────────────────────────────────────────────────────┐
+│  FinSentinel                                                     ☀ / ☾ Theme │
+│  Financial Crime Risk Assessment Workbench                                   │
+│  Synthetic environment — no real data · Simulation sign-in (no password)     │
+│                                                                              │
+│  Choose who you are for this session                                         │
+│                                                                              │
+│  ┌──────────────────────┐  ┌──────────────────────┐                          │
+│  │ 👤 Pat Owner          │  │ 🔎 Kim Analyst        │                          │
+│  │ PRODUCT OWNER         │  │ FCRM ANALYST          │                          │
+│  │ Submits changes,      │  │ Reviews and challenges│                          │
+│  │ uploads documents,    │  │ AI output, overrides  │                          │
+│  │ answers information   │  │ with rationale,       │                          │
+│  │ requests.             │  │ finalizes assessment. │                          │
+│  │ Cannot approve/reject.│  │ Cannot decide.        │                          │
+│  │        [ Continue ]   │  │        [ Continue ]   │                          │
+│  └──────────────────────┘  └──────────────────────┘                          │
+│  ┌──────────────────────┐  ┌──────────────────────┐                          │
+│  │ ⚖ Lee Committee       │  │ ⚙ Raj Admin           │                          │
+│  │ RISK COMMITTEE        │  │ FCRM ADMINISTRATOR    │                          │
+│  │ Reviews packet and    │  │ Publishes risk model  │                          │
+│  │ overrides; approves,  │  │ versions, views       │                          │
+│  │ approves w/ conditions│  │ Quality Center and    │                          │
+│  │ defers or rejects.    │  │ Ops.                  │                          │
+│  │ Cannot edit evidence. │  │ Cannot assess/decide. │                          │
+│  │        [ Continue ]   │  │        [ Continue ]   │                          │
+│  └──────────────────────┘  └──────────────────────┘                          │
+│                                                                              │
+│  Or pick from list: [ Select user ▾ ]                                        │
+└──────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>Behaviour:</p>
+<ul>
+<li>Tiles and the dropdown are two views of the same <code>GET /api/auth/users</code> list (display name, username, role, role description). The dropdown exists for narrow screens and keyboard users.</li>
+<li>Selecting a tile calls <code>POST /api/auth/login { username }</code> and redirects to <code>/cases</code>. No password field is rendered. The backend accepts an optional <code>password</code> for forward compatibility and ignores it when <code>AUTH_MODE=simulation</code> (the only mode in the hackathon).</li>
+<li>The role badge in the top bar shows the chosen role at all times, and a <strong>Switch user</strong> action in the user menu returns to this screen (ends the session, audited as <code>logout</code>).</li>
+<li>Every audit event still records the real selected user and role, so the History tab remains meaningful in the demo.</li>
+</ul>
+<p><strong>Role access summary shown on tiles</strong> (authoritative matrix is §7 and PRD §4.2):</p>
+<p>| Role | Can | Cannot | |---|---|---| | Product Owner | Create case, upload documents, answer information requests, view status and history | Approve, reject, override, edit assessment, change risk model | | FCRM Analyst | Review and challenge AI output, confirm facts, resolve contradictions, set controls, override with rationale, edit assessment, finalize | Record committee decision, change risk model, alter history | | Risk Committee | Review packet, evidence and overrides; approve, approve with conditions, defer, reject | Edit facts/assessment/evidence, change risk model, alter history | | FCRM Administrator | Publish risk model versions, view Quality Center and Ops | Assess, override, decide, alter history |</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-1a-theme-light-and-dark">4.1a Theme — light and dark</h2><span class="chev">▾</span></div><div class="body">
+<p>The UI supports a light and a dark theme.</p>
+<ul>
+<li>Toggle in the top bar (☀ / ☾) and on the sign-in screen; choice persists in <code>localStorage</code> and follows <code>prefers-color-scheme</code> on first visit.</li>
+<li>Implemented with CSS custom properties on <code>:root[data-theme="light|dark"]</code>; components never hard-code colours.</li>
+<li>Semantic tokens (not raw colours) for everything that carries meaning: <code>--band-very-low … --band-very-high</code>, <code>--state-*</code>, <code>--verdict-supported / -unsupported / -weak</code>, <code>--warning</code>, <code>--danger</code>, <code>--success</code>. Each token has a light and a dark value that meets WCAG AA contrast (≥ 4.5:1 for text, ≥ 3:1 for chips) on its background.</li>
+<li>Wireframes and ASCII art in this document are theme-neutral; icons and words always accompany colour (§6), so both themes convey the same meaning.</li>
+<li>Playwright E2E runs the demo path in both themes (<code>colorScheme: 'light' | 'dark'</code> projects) and captures screenshots for the Quality Center.</li>
+</ul>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-2-case-list">4.2 Case list</h2><span class="chev">▾</span></div><div class="body">
+<pre><code>┌ Cases ──────────────────────────────────────────────── [ + New case ] (PO) ┐
+│ Filter: [All states ▾] [All types ▾]  Search [__________]                   │
+│ Ref      Title                              Type     State            Residual │
+│ RA-1028  International Instant Payments SMB product  ANALYST REVIEW   ● High   │
+│ RA-1027  Domestic savings goal feature      feature  COMMITTEE REVIEW ● Low    │
+│ RA-1026  New KYC vendor onboarding          vendor   ASSESSMENT  ⟳ step 7/10   │
+│ RA-1025  Launch international payments      product  INFO REQUESTED  ⚠ 5 gaps  │
+└──────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>State chips use one hue per state; residual band chips use the five-band scale.</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-3-create-case-product-owner">4.3 Create case (Product Owner)</h2><span class="chev">▾</span></div><div class="body">
+<p>Fields: Title<em>, Change type</em> (select), Description* (multiline, min 50 chars), Documents (drag-drop; PDF/DOCX/XLSX; each shows type check result immediately). Submit → case created in SUBMITTED, pipeline starts, redirect to overview. Validation errors inline under fields (FR-INT-02). Unsupported file → red row "Unsupported type (.exe). Allowed: PDF, DOCX, XLSX" (FR-INT-04).</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-4-case-workspace-overview">4.4 Case workspace — Overview</h2><span class="chev">▾</span></div><div class="body">
+<pre><code>┌ RA-1028  International Instant Payments for SMB              State: ANALYST REVIEW ┐
+│ Product change · Submitted by owner.pat · Risk model v1.3 · Prompts ext v2 / asm v4 │
+├────────────────────────────────────────────────┬─────────────────────────────────────┤
+│ PIPELINE                                       │ BLOCKERS (4)                        │
+│ ✓ Parse 2 docs        ✓ Extract 17 facts       │ ⚠ 3 missing facts   → Facts        │
+│ ✓ Contradictions 1    ✓ Missing 3              │ ⚠ 1 contradiction   → Facts        │
+│ ✓ Scope 6 dims        ✓ Retrieve 9 sections    │ ⚠ 1 unsupported claim → Assessment │
+│ ✓ Assess              ✓ Ground 11/12 supported │ ⚠ 2 low-confidence facts → Facts   │
+│ ✓ Score  Inherent 3.9 High → Residual 3.1 Mod  │                                     │
+│ Tokens this case: 21,430 in · 3,880 out ·      │ [ Finalize → Committee ] (disabled) │
+│ 14,200 cache read · $0.41                      │  &quot;Clear 4 blockers to finalize&quot;     │
+├────────────────────────────────────────────────┴─────────────────────────────────────┤
+│ ⚠ Document &quot;vendor_questionnaire.xlsx&quot; contains instruction-like text.               │
+│   Treated as document content. Not used as an instruction.        [View]            │
+└──────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>LLM failure variant of the pipeline card:</p>
+<pre><code>│ ✗ Assess — LLM service unavailable (HTTP 500 after 3 attempts, 14:02:11)            │
+│   Case remains in ASSESSMENT. No decision has been made.                            │
+│   [ Retry step ]   [ Continue manually → Analyst Review ]                           │</code></pre>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-5-facts-tab">4.5 Facts tab</h2><span class="chev">▾</span></div><div class="body">
+<pre><code>┌ FACTS ─────────────────────────────────────────────────────────────────────────────┐
+│ Field               Value                 Conf  Status          Source              │
+│ Customer segment    SMB                   0.96  ✓ extracted     proposal.docx §2  ↗ │
+│ Geographies         Canada, Mexico        0.91  ⚠ conflicted    2 sources        ↗ │
+│ Channel             API                   0.98  ✓ extracted     proposal.docx §4  ↗ │
+│ Transaction volume  —                     —     ✗ missing       [Ask owner]        │
+│ Third party         Yes — PayRail Inc.    0.88  ✓ extracted     vendor.xlsx r12   ↗ │
+│ Monitoring coverage Partial               0.62  ⚠ low confidence [Confirm] [Edit]  │
+├────────────────────────────────────────────────────────────────────────────────────┤
+│ CONTRADICTION — Geographies                                                        │
+│  Product proposal §3:      Canada, Mexico                     &quot;…launch in CA &amp; MX&quot; │
+│  Vendor questionnaire r8:  Canada, Mexico, Brazil             &quot;…coverage incl BR&quot;  │
+│  Resolve as: (•) Canada, Mexico  ( ) Canada, Mexico, Brazil  ( ) Other [_______]   │
+│  Rationale*: [__________________________________________________] [ Resolve ]       │
+├────────────────────────────────────────────────────────────────────────────────────┤
+│ INFORMATION REQUESTS (3 open)                                                      │
+│  Transaction volume — &quot;What is the expected monthly transaction volume…?&quot;  open    │
+│     [ Accept gap with rationale ]                                                  │
+└────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>Clicking ↗ opens the source chunk in the right panel with the quote highlighted. Confirm/Edit on low-confidence facts are audited. Product Owner sees the same tab read-only plus an <strong>Answer</strong> box on each open request.</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-6-evidence-tab">4.6 Evidence tab</h2><span class="chev">▾</span></div><div class="body">
+<p>Two lists: <strong>Policy evidence</strong> (section ref, title, BM25 score, the query used, dimension) and <strong>Document chunks</strong> (per document, with injection flags marked). Each row opens full text in the context panel. Empty retrieval shows: "No policy sections matched. Assessment claims cannot be supported until evidence is attached."</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-7-assessment-tab">4.7 Assessment tab</h2><span class="chev">▾</span></div><div class="body">
+<pre><code>┌ AI ASSESSMENT  (claude-opus-5 · prompt v4 · 14:01:52)          [ Edit narrative ] ┐
+│ Summary: The change introduces cross-border SMB payments via a third-party…        │
+├────────────────────────────────────────────────────────────────────────────────────┤
+│ CLAIMS                                                                             │
+│ ✓ SUPPORTED   Cross-border SMB payments require enhanced transaction monitoring.    │
+│               ↳ TM Standard §7  &quot;…real-time monitoring for cross-border…&quot;           │
+│ ✓ SUPPORTED   Mexico is designated higher-risk in the AML Policy.                   │
+│               ↳ AML Policy §5.3                                                     │
+│ ⚠ UNSUPPORTED Vendor has strong sanctions controls.                                 │
+│               No verifiable citation. Vendor self-assertion only (vendor.xlsx r20). │
+│               [ Attach evidence ] [ Remove claim ]                                  │
+│ ~ WEAK        Existing KYC controls cover the new segment.   ↳ KYC Std §2 (partial) │
+└────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>Verdict icons and words are always shown together (colour is not the only signal).</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-8-risk-tab-the-demo-centrepiece">4.8 Risk tab — the demo centrepiece</h2><span class="chev">▾</span></div><div class="body">
+<pre><code>┌ RISK  Risk model v1.3 · Calculation #3 (after override, 14:08:04)                  ┐
+│ Dimension    Wt   AI rec.   Current   Control        Inherent  Residual            │
+│ Geography    20%  4 High    3 Mod ✎   adequate (.6)  3.00      2.40                │
+│              └ Overridden by analyst.kim 14:08:03 — &quot;Comparable products have…&quot;  ↗ │
+│ Transaction  20%  4 High    4 High    weak (.3)      4.00      3.55                │
+│ Third party  15%  4 High    4 High    unverified     4.00      4.00  ⚠ set control │
+│ Channel      10%  3 Mod     3 Mod     strong (.9)    3.00      2.10                │
+│ Customer     10%  3 Mod     3 Mod     adequate       3.00      2.40                │
+│ Product      10%  3 Mod     3 Mod     none           3.00      3.00                │
+│ Technology   10%  2 Low     2 Low     adequate       2.00      1.70                │
+│ Process       5%  2 Low     2 Low     none           2.00      2.00                │
+├────────────────────────────────────────────────────────────────────────────────────┤
+│ INHERENT  3.35  ● High          →   RESIDUAL  2.93  ● Moderate                     │
+│ Controls reduce but never eliminate risk (floor 1.0, max mitigation 50%).          │
+│ [ Show formula ]                                                                    │
+└────────────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>Override dialog (opens from ✎):</p>
+<pre><code>┌ Override — Geography ─────────────────────────────┐
+│ AI recommended: 4 High      Current: 4 High        │
+│ New score:  (1) (2) (•3) (4) (5)                   │
+│ Rationale* (min 20 chars)                          │
+│ [Comparable existing products have established   ] │
+│ [monitoring coverage and similar geographic…     ] │
+│ Recorded: analyst.kim · Analyst · risk model v1.3  │
+│                        [ Cancel ] [ Save override ] │
+└────────────────────────────────────────────────────┘</code></pre>
+<p>Saving recalculates immediately; the RESIDUAL row animates from old to new value and a History entry appears. Control rating dialog is identical in shape (rating + rationale).</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-9-committee-tab">4.9 Committee tab</h2><span class="chev">▾</span></div><div class="body">
+<p>Read-only packet: header, final residual with band, dimension table (with override markers), overrides list with rationale, unsupported/weak claims (should be zero), evidence list, information gaps accepted with rationale, audit integrity status. Decision block (Committee only):</p>
+<pre><code>┌ DECISION ──────────────────────────────────────────────────────────────────┐
+│ ( ) Approve   (•) Approve with conditions   ( ) Defer   ( ) Reject          │
+│ Conditions*  1. [Complete vendor sanctions control testing before launch ] │
+│              2. [Monthly TM tuning review for first 6 months            ] │
+│              [ + condition ]                                               │
+│ Rationale*   [__________________________________________________________] │
+│ Deciding as committee.lee · Risk Committee                [ Record decision ] │
+└────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>Analysts and Product Owners see the packet but no decision block. Nothing in the UI, for any role, offers an "auto-approve".</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-10-history-tab">4.10 History tab</h2><span class="chev">▾</span></div><div class="body">
+<pre><code>14:12:41  committee.lee  Decision APPROVE_WITH_CONDITIONS (2 conditions)      ↗
+14:08:04  system         Risk recalculated  3.35/High → 2.93/Moderate (model v1.3)
+14:08:03  analyst.kim    Override Geography 4 → 3  &quot;Comparable existing products…&quot;
+14:07:12  analyst.kim    Control set Channel = strong  &quot;Existing API gateway…&quot;
+14:04:22  system         Risk calculated (pipeline)  3.9/High → 3.1/Moderate
+14:04:21  system         Assessment drafted (claude-opus-5, prompt v4)
+14:03:02  system         Risk scope: 6 dimensions
+14:02:18  system         Documents processed (2)  ⚠ instruction-like content flagged
+14:02:14  owner.pat      Case submitted
+─────────────────────────────────────────────────────────────────────────────
+Integrity: ✓ 9 events, hash chain verified 14:12:45     [ Verify again ]</code></pre>
+<p>Each row expands to previous/new JSON. There is no edit affordance anywhere on this tab.</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-11-finsentinel-quality-center-quality">4.11 FinSentinel Quality Center (<code>/quality</code>)</h2><span class="chev">▾</span></div><div class="body">
+<pre><code>┌ FINSENTINEL QUALITY CENTER        last run 2026-09-28 13:40 · commit a1b2c3d ┐
+│ SOFTWARE                                  AI QUALITY (golden set, 42 cases)   │
+│ Unit          48/48   ● PASS              Fact extraction accuracy   96.2%    │
+│ Integration    9/9    ● PASS              Retrieval precision        90.5%    │
+│ Security      12/12   ● PASS              Evidence grounding         94.1%    │
+│ Adversarial    7/7    ● PASS              Band agreement             88.1%    │
+│ E2E           10/10   ● PASS              Unsupported claims          1.9%    │
+│                                                                              │
+│ ADVERSARIAL (live)                                                           │
+│ Prompt injection        PASS  [Run now]   LLM failure handling  PASS [Run now]│
+│ Contradiction detection PASS  [Run now]   Missing information    PASS [Run now]│
+│                                                                              │
+│ TOKENS  optimized 21.4K/case vs baseline 68.9K/case  (−69%)  cache hit 61%   │
+│                                                                              │
+│ RELEASE STATUS  ● PASS   (14/14 gates)                    [ Gate details ]   │
+└──────────────────────────────────────────────────────────────────────────────┘</code></pre>
+<p>All numbers come from <code>/api/quality</code>; if no run exists the tiles show "No run yet", never a placeholder number (FR-QC-05). "Run now" executes the adversarial fixture against a sandbox case and streams the result.</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-12-operations-dashboard-ops">4.12 Operations dashboard (<code>/ops</code>)</h2><span class="chev">▾</span></div><div class="body">
+<p>Tiles: API p50/p95 latency, error rate, DB status, LLM reachability, pipeline failures (24 h), tokens today, cost today, overrides (7 d), AI/analyst disagreement rate, cases by state, mean time to decision, health endpoints status.</p>
+</div></section><section class="card"><div class="cardhead"><span class="num">4</span><h2 id="4-13-admin-risk-model-admin-risk-model">4.13 Admin — Risk model (<code>/admin/risk-model</code>)</h2><span class="chev">▾</span></div><div class="body">
+<p>Left: active version JSON (read-only) with weights table. Right: editor for a new version with live validation ("Weights total 95% — must be 100%"). Publish requires a note; existing cases keep their frozen version (banner explains this).</p>
+<p>---</p>
+<h2>5. Component inventory</h2>
+<p>| Component | Used in | Notes | |---|---|---| | <code>StateChip</code> | list, header | one hue per workflow state | | <code>BandChip</code> | list, risk, packet | VeryLow…VeryHigh, icon + text | | <code>VerdictBadge</code> | assessment | ✓ SUPPORTED / ⚠ UNSUPPORTED / ~ WEAK | | <code>PipelineStepper</code> | overview | statuses, tokens, failure card | | <code>BlockersRail</code> | overview, sticky | links to the tab that clears each blocker | | <code>SourceLink</code> (↗) | facts, claims, evidence | opens <code>ContextPanel</code> | | <code>ContextPanel</code> | right rail | chunk text with highlighted quote, flags | | <code>RationaleDialog</code> | override, control, resolve, accept-gap, decision | shared form: fields + rationale (min 20) + actor line | | <code>DimensionTable</code> | risk, packet | three-column truth | | <code>AuditTimeline</code> | history | expandable rows | | <code>StatTile</code> | quality, ops | label, value, trend, status | | <code>InjectionBanner</code> | overview, evidence | fixed copy from FR-ADV-03 | | <code>UserTile</code> | sign-in | name, role label, role description, Continue | | <code>UserSelect</code> | sign-in | dropdown alternative to tiles | | <code>ThemeToggle</code> | top bar, sign-in | ☀/☾, persists choice |</p>
+<p>---</p>
+<h2>6. Interaction rules</h2>
+<ul>
+<li>Mutating actions show an inline confirmation state, then an audit toast "Recorded in history".</li>
+<li>Disabled primary buttons always carry a reason string next to them.</li>
+<li>Long operations (pipeline) poll <code>/api/cases/:id/pipeline</code> every 2 s; no websockets.</li>
+<li>All dialogs are keyboard-navigable; focus returns to the trigger on close.</li>
+<li>Colour is never the sole carrier of meaning (icons + words everywhere); this also keeps light and dark themes equivalent.</li>
+<li>Theme switch applies instantly without reload and does not reset form state.</li>
+<li>Numbers: scores to 2 dp, percentages to 1 dp, tokens with thousands separators.</li>
+</ul>
+<p>---</p>
+<h2>7. Role visibility matrix (UI)</h2>
+<p>| Element | PO | Analyst | Committee | Admin | |---|---|---|---|---| | New case button | ✓ | | | | | Upload documents | ✓ (own cases) | | | | | Answer information request | ✓ | | | | | Confirm/edit facts, resolve contradictions | | ✓ | | | | Override, control rating | | ✓ | | | | Edit assessment / claims | | ✓ | | | | Finalize | | ✓ | | | | Decision block | | | ✓ | | | Risk model editor | | | | ✓ | | Quality Center, Ops | ✓ | ✓ | ✓ | ✓ | | History tab | ✓ | ✓ | ✓ | ✓ |</p>
+<p>---</p>
+<h2>8. Demo walkthrough mapping (PRD §13)</h2>
+<p>| Step | Screen / action | |---|---| | 0 Sign in | /signin: pick the <strong>Pat Owner</strong> tile (no password); optionally flip theme to show light/dark | | 1 Submit | /cases/new as owner.pat, upload proposal + vendor questionnaire | | 2 Extraction | Overview pipeline card: "17 facts · 3 missing · 6 dimensions" | | 3 Missing info | Facts tab: information requests | | 4 Evidence | Evidence tab | | 5 AI assessment | Assessment tab, recommendation High | | 6 Deterministic calc | Risk tab, "Show formula" | | 7–9 Challenge | Risk tab ✎ Geography → RationaleDialog → live recalculation | | 10 Audit | History tab + Verify | | 11 To committee | Finalize (blockers cleared) | | 12 Decision | Committee tab as committee.lee, Approve with conditions | | 13 Quality Center | /quality | | 14 Adversarial | Quality Center "Run now" on Prompt injection; then open the sandbox case to show the banner | | 15 Metrics | Quality Center AI tiles + tokens tile | | 16 Ops | /ops |</p>
+<p>---</p>
+<h2>9. Traceability (UX → PRD)</h2>
+<p>| Screen / component | PRD IDs | |---|---| | Create case, uploads | FR-INT-01…06 | | Overview pipeline + failure card | FR-ARC-04, FR-FAIL-02, UX-07 | | InjectionBanner | FR-ADV-03 | | Facts tab | FR-EXT-03…05, FR-MIS, FR-CON, UX-02 | | Evidence tab | FR-RET-03/04 | | Assessment tab | FR-ASM-02…05, UX-03 | | Risk tab + RationaleDialog | FR-RSK-10, FR-OVR-01…07, UX-01, UX-04 | | Committee tab | FR-WF-03…07, FR-OVR-07, UX-06 | | History tab | FR-AUD-05/06, UX-05 | | Quality Center | FR-QC-01…06, UX-08 | | Ops dashboard | FR-OBS-04 | | Admin risk model | FR-RSK-04/05, FR-RBAC-06 | | Role visibility matrix | FR-RBAC-01…04 | | Sign-in role tiles (simulation) | FR-RBAC-01, NFR-SEC-01 (simulation mode), NFR-SEC-10 | | Light/dark theme | UX-01…08 (readability on projector and in both schemes) |</p></div></section><div class="empty">No matching section found.</div></main></div><button class="topbtn">↑ Top</button><script>
+const cards=[...document.querySelectorAll('.card')],toc=[...document.querySelectorAll('.toc a')],side=document.querySelector('.side'),q=document.querySelector('.search');const saved=localStorage.getItem('fs-doc-theme');if(saved)document.documentElement.dataset.theme=saved;document.querySelector('#theme').onclick=()=>{const v=document.documentElement.dataset.theme==='dark'?'light':'dark';document.documentElement.dataset.theme=v;localStorage.setItem('fs-doc-theme',v)};document.querySelector('.mobile').onclick=()=>side.classList.toggle('open');document.querySelector('#expand').onclick=()=>cards.forEach(x=>x.classList.remove('closed'));document.querySelector('#collapse').onclick=()=>cards.forEach(x=>x.classList.add('closed'));document.querySelectorAll('.cardhead').forEach(h=>h.onclick=()=>h.parentElement.classList.toggle('closed'));document.querySelectorAll('pre').forEach(p=>{const b=document.createElement('button');b.className='copy';b.textContent='Copy';b.onclick=e=>{e.stopPropagation();navigator.clipboard.writeText(p.querySelector('code').innerText);b.textContent='Copied';setTimeout(()=>b.textContent='Copy',1100)};p.appendChild(b)});q.oninput=()=>{const t=q.value.trim().toLowerCase();let n=0;cards.forEach(c=>{const ok=!t||c.innerText.toLowerCase().includes(t);c.style.display=ok?'':'none';if(ok){n++;if(t)c.classList.remove('closed')}});document.querySelector('.empty').style.display=n?'none':'block'};const ob=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)toc.forEach(a=>a.classList.toggle('active',a.hash==='#'+e.target.id))}),{rootMargin:'-20% 0px -72%'});document.querySelectorAll('.card h2[id]').forEach(h=>ob.observe(h));toc.forEach(a=>a.onclick=()=>side.classList.remove('open'));window.onscroll=()=>{const d=document.documentElement,p=d.scrollTop/(d.scrollHeight-d.clientHeight)*100;document.querySelector('.progress').style.width=p+'%';document.querySelector('.topbtn').style.display=d.scrollTop>650?'block':'none'};document.querySelector('.topbtn').onclick=()=>scrollTo({top:0,behavior:'smooth'});
+</script></body></html>
