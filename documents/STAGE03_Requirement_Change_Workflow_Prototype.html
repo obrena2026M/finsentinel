@@ -1,0 +1,568 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Interactive simulation of a controlled requirement-change workflow for FinSentinel.">
+  <title>Requirement Change Workflow | FinSentinel</title>
+  <style>
+    :root {
+      color-scheme: light;
+      --bg: #f3f6fb;
+      --panel: #fff;
+      --panel-alt: #f7f9fd;
+      --ink: #152238;
+      --muted: #68778e;
+      --line: #dce4ef;
+      --blue: #2563eb;
+      --blue-soft: #eaf1ff;
+      --cyan: #0891b2;
+      --green: #07845d;
+      --green-soft: #e6f7f0;
+      --amber: #a85e08;
+      --amber-soft: #fff4df;
+      --red: #c24146;
+      --shadow: 0 12px 34px rgba(28, 48, 79, .08);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+    }
+    [data-theme="dark"] {
+      color-scheme: dark;
+      --bg: #091321;
+      --panel: #101d2d;
+      --panel-alt: #14243a;
+      --ink: #e7eef8;
+      --muted: #9bacbf;
+      --line: #293a51;
+      --blue: #80aaff;
+      --blue-soft: #192d4a;
+      --cyan: #4dd4ed;
+      --green: #53d5a5;
+      --green-soft: #123729;
+      --amber: #ffca7c;
+      --amber-soft: #392b19;
+      --red: #ff8288;
+      --shadow: 0 16px 40px rgba(0, 0, 0, .2);
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: var(--bg); color: var(--ink); font-size: 14px; line-height: 1.5; }
+    button, select { font: inherit; }
+    button { cursor: pointer; }
+    .topbar { height: 66px; display: flex; align-items: center; gap: 14px; padding: 0 28px; background: var(--panel); border-bottom: 1px solid var(--line); }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 850; letter-spacing: -.03em; }
+    .brandmark { display: grid; place-items: center; width: 34px; height: 34px; border-radius: 11px; color: #fff; background: linear-gradient(145deg, #06a6ba, #3268eb); font-weight: 900; }
+    .separator { height: 25px; border-left: 1px solid var(--line); }
+    .top-label { color: var(--muted); font-size: 13px; }
+    .grow { flex: 1; }
+    .subtle-button, .primary-button, .quiet-button, .decision-button { border: 1px solid var(--line); border-radius: 9px; padding: 8px 12px; color: var(--ink); background: var(--panel); }
+    .subtle-button:hover, .quiet-button:hover { border-color: var(--blue); color: var(--blue); }
+    .layout { width: min(1420px, 100%); margin: 0 auto; padding: 30px 30px 52px; }
+    .eyebrow { color: var(--blue); font-size: 11px; font-weight: 850; letter-spacing: .13em; text-transform: uppercase; }
+    h1 { margin: 5px 0 5px; font-size: clamp(26px, 3vw, 36px); letter-spacing: -.045em; line-height: 1.13; }
+    .intro { max-width: 760px; margin: 0; color: var(--muted); }
+    .demo-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; margin: 22px 0 17px; padding: 13px 16px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel); box-shadow: var(--shadow); }
+    .demo-bar label { color: var(--muted); font-size: 12px; font-weight: 750; }
+    select { min-width: 230px; padding: 8px 34px 8px 10px; border: 1px solid var(--line); border-radius: 8px; color: var(--ink); background: var(--panel); }
+    .demo-note { color: var(--muted); font-size: 12px; }
+    .primary-button { border-color: var(--blue); color: #fff; background: var(--blue); font-weight: 750; }
+    .primary-button:hover { filter: brightness(1.06); }
+    .primary-button:disabled, .quiet-button:disabled { cursor: not-allowed; opacity: .48; }
+    .simulation { display: grid; grid-template-columns: minmax(0, 1.55fr) minmax(310px, .85fr); gap: 17px; align-items: start; }
+    .panel { border: 1px solid var(--line); border-radius: 15px; background: var(--panel); box-shadow: var(--shadow); }
+    .panel-heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 17px 19px; border-bottom: 1px solid var(--line); }
+    .panel-heading h2 { margin: 0; font-size: 15px; letter-spacing: -.01em; }
+    .panel-kicker { color: var(--muted); font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: .07em; }
+    .status { display: inline-flex; align-items: center; gap: 7px; padding: 5px 9px; border-radius: 99px; color: var(--amber); background: var(--amber-soft); font-size: 11px; font-weight: 800; white-space: nowrap; }
+    .status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+    .status.running { color: var(--blue); background: var(--blue-soft); }
+    .status.done { color: var(--green); background: var(--green-soft); }
+    .status.blocked { color: var(--red); background: color-mix(in srgb, var(--red) 12%, var(--panel)); }
+    .workflow-wrap { padding: 23px 21px 12px; }
+    .workflow { display: grid; grid-template-columns: repeat(7, minmax(85px, 1fr)); position: relative; gap: 5px; }
+    .workflow::before { content: ""; position: absolute; z-index: 0; top: 17px; left: 7%; right: 7%; height: 2px; background: var(--line); }
+    .workflow-progress { position: absolute; z-index: 1; top: 17px; left: 7%; height: 2px; width: 0; background: linear-gradient(90deg, var(--cyan), var(--blue)); transition: width .55s ease; }
+    .stage { position: relative; z-index: 2; display: grid; justify-items: center; align-content: start; gap: 8px; min-width: 0; border: 0; padding: 0 3px 9px; color: var(--muted); background: transparent; text-align: center; }
+    .stage-dot { display: grid; place-items: center; width: 36px; height: 36px; border: 2px solid var(--line); border-radius: 50%; color: var(--muted); background: var(--panel); font-size: 12px; font-weight: 850; transition: .25s; }
+    .stage-label { max-width: 112px; font-size: 11px; line-height: 1.25; font-weight: 700; }
+    .stage.active { color: var(--blue); }
+    .stage.active .stage-dot { transform: scale(1.08); border-color: var(--blue); color: #fff; background: var(--blue); box-shadow: 0 0 0 5px var(--blue-soft); }
+    .stage.complete { color: var(--green); }
+    .stage.complete .stage-dot { border-color: var(--green); color: #fff; background: var(--green); }
+    .stage.waiting .stage-dot { border-color: var(--amber); color: var(--amber); }
+    .stage:focus-visible { outline: 2px solid var(--blue); outline-offset: 2px; border-radius: 7px; }
+    .current-step { margin: 5px 20px 19px; padding: 18px; border: 1px solid var(--line); border-radius: 12px; background: var(--panel-alt); animation: arrive .35s ease both; }
+    @keyframes arrive { from { opacity: .45; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+    .step-top { display: flex; flex-wrap: wrap; align-items: center; gap: 9px; margin-bottom: 9px; }
+    .step-number { color: var(--blue); font-size: 11px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+    .gate-tag { padding: 3px 7px; border: 1px solid color-mix(in srgb, var(--amber) 45%, var(--line)); border-radius: 99px; color: var(--amber); font-size: 10px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+    .current-step h3 { margin: 0 0 7px; font-size: 18px; letter-spacing: -.025em; }
+    .current-step p { margin: 0; color: var(--muted); }
+    .step-content { margin-top: 14px; }
+    .detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 9px; }
+    .detail { padding: 10px 11px; border: 1px solid var(--line); border-radius: 9px; background: var(--panel); }
+    .detail small { display: block; margin-bottom: 3px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .07em; text-transform: uppercase; }
+    .detail strong { font-size: 12px; overflow-wrap: anywhere; }
+    .tag-list { display: flex; flex-wrap: wrap; gap: 6px; }
+    .tag { display: inline-block; padding: 4px 7px; border: 1px solid var(--line); border-radius: 7px; background: var(--panel); color: var(--ink); font: 11px/1.35 ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .note-box { margin-top: 10px; padding: 10px 12px; border-left: 3px solid var(--cyan); border-radius: 5px; color: var(--muted); background: color-mix(in srgb, var(--cyan) 8%, var(--panel)); font-size: 12px; }
+    .approval { margin-top: 13px; padding: 13px; border: 1px solid color-mix(in srgb, var(--amber) 38%, var(--line)); border-radius: 10px; background: var(--amber-soft); }
+    .approval strong { display: block; margin-bottom: 3px; font-size: 12px; }
+    .approval p { font-size: 12px; }
+    .decision-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 11px; }
+    .decision-button { border-color: color-mix(in srgb, var(--green) 45%, var(--line)); color: var(--green); background: var(--panel); font-size: 12px; font-weight: 800; }
+    .decision-button:hover { background: var(--green-soft); }
+    .decision-button.secondary { border-color: var(--line); color: var(--muted); }
+    .decision-button.secondary:hover { color: var(--amber); }
+    .revision-message { display: none; margin-top: 9px; color: var(--amber); font-size: 12px; font-weight: 700; }
+    .revision-message.visible { display: block; }
+    .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 0 20px 19px; }
+    .quiet-button { padding: 8px 11px; font-size: 12px; font-weight: 700; }
+    .control-hint { margin-left: auto; color: var(--muted); font-size: 11px; }
+    .side-stack { display: grid; gap: 17px; }
+    .request-card { padding: 17px 18px; }
+    .request-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; }
+    .request-id { color: var(--blue); font: 750 11px ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .request-title { margin: 5px 0 7px; font-size: 16px; line-height: 1.3; letter-spacing: -.02em; }
+    .request-desc { margin: 0; color: var(--muted); font-size: 12px; }
+    .version-change { display: flex; align-items: center; gap: 9px; margin-top: 16px; padding: 11px; border: 1px solid var(--line); border-radius: 10px; background: var(--panel-alt); }
+    .version { padding: 5px 8px; border-radius: 7px; background: var(--panel); font: 750 12px ui-monospace, SFMono-Regular, Consolas, monospace; }
+    .version.new { color: var(--green); background: var(--green-soft); }
+    .arrow { color: var(--muted); }
+    .version-caption { margin-left: auto; color: var(--muted); font-size: 10px; text-align: right; }
+    .trace-list { display: grid; gap: 0; padding: 5px 18px 14px; }
+    .trace-item { display: grid; grid-template-columns: 22px minmax(0,1fr) auto; align-items: center; gap: 9px; min-height: 38px; border-bottom: 1px solid var(--line); font-size: 11px; }
+    .trace-item:last-child { border-bottom: 0; }
+    .trace-icon { display: grid; place-items: center; width: 20px; height: 20px; border-radius: 50%; color: var(--muted); background: var(--panel-alt); font-size: 10px; font-weight: 850; }
+    .trace-item.active .trace-icon { color: var(--blue); background: var(--blue-soft); }
+    .trace-item.complete .trace-icon { color: var(--green); background: var(--green-soft); }
+    .trace-item.waiting .trace-icon { color: var(--amber); background: var(--amber-soft); }
+    .trace-label { color: var(--muted); }
+    .trace-item.active .trace-label, .trace-item.complete .trace-label { color: var(--ink); font-weight: 700; }
+    .trace-status { color: var(--muted); font-size: 10px; }
+    .impact-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; padding: 14px 16px 16px; }
+    .metric { padding: 10px 8px; border: 1px solid var(--line); border-radius: 9px; text-align: center; }
+    .metric strong { display: block; font-size: 17px; letter-spacing: -.03em; }
+    .metric span { color: var(--muted); font-size: 9px; font-weight: 750; text-transform: uppercase; letter-spacing: .05em; }
+    .metric .saving { color: var(--green); }
+    .footnote { margin: 0; padding: 0 16px 15px; color: var(--muted); font-size: 10px; }
+    .principle { display: flex; align-items: center; gap: 9px; padding: 12px 14px; border: 1px solid color-mix(in srgb, var(--cyan) 28%, var(--line)); border-radius: 11px; color: var(--muted); background: color-mix(in srgb, var(--cyan) 6%, var(--panel)); font-size: 11px; }
+    .principle b { color: var(--cyan); white-space: nowrap; }
+    .toast { position: fixed; right: 22px; bottom: 22px; z-index: 5; max-width: 340px; padding: 12px 15px; border: 1px solid var(--line); border-radius: 10px; color: var(--ink); background: var(--panel); box-shadow: var(--shadow); opacity: 0; transform: translateY(10px); pointer-events: none; transition: .2s; }
+    .toast.visible { opacity: 1; transform: translateY(0); }
+    @media (max-width: 1000px) {
+      .simulation { grid-template-columns: 1fr; }
+      .side-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; }
+      .principle { grid-column: 1 / -1; }
+    }
+    @media (max-width: 680px) {
+      .topbar { height: 58px; padding: 0 14px; gap: 9px; }
+      .top-label, .separator { display: none; }
+      .layout { padding: 22px 13px 36px; }
+      .demo-bar { align-items: stretch; }
+      .demo-bar select { flex: 1; min-width: 190px; }
+      .demo-note { flex-basis: 100%; }
+      .workflow-wrap { padding: 19px 10px 8px; overflow-x: auto; }
+      .workflow { min-width: 640px; }
+      .current-step { margin: 5px 11px 15px; padding: 14px; }
+      .controls { padding: 0 11px 14px; }
+      .control-hint { flex-basis: 100%; margin: 2px 0 0; }
+      .side-stack { grid-template-columns: 1fr; }
+      .detail-grid { grid-template-columns: 1fr; }
+      .principle { grid-column: auto; }
+      .brand span { font-size: 13px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+  <header class="topbar">
+    <div class="brand"><span class="brandmark">F</span><span>FinSentinel</span></div>
+    <span class="separator"></span>
+    <span class="top-label">Development workflow simulator</span>
+    <span class="grow"></span>
+    <button class="subtle-button" id="themeButton" type="button" aria-label="Switch color theme">◐ Theme</button>
+  </header>
+
+  <main class="layout">
+    <div class="eyebrow">Stage 03 · Development</div>
+    <h1>Requirement change, under control.</h1>
+    <p class="intro">See how a small requirement update moves from intake to human-approved scope, targeted implementation, evidence-backed validation, and traceability records.</p>
+
+    <section class="demo-bar" aria-label="Simulation controls">
+      <label for="scenario">Demo change</label>
+      <select id="scenario">
+        <option value="pdf">REQ-008 · Add PDF report export</option>
+        <option value="timeout">REQ-004 · Configure session timeout</option>
+      </select>
+      <button class="primary-button" id="runButton" type="button">▶ Run simulation</button>
+      <button class="quiet-button" id="resetButton" type="button">↺ Reset</button>
+      <span class="grow"></span>
+      <span class="demo-note">Simulated data · no repository files are changed</span>
+    </section>
+
+    <div class="simulation">
+      <section class="panel" aria-labelledby="workflowTitle">
+        <div class="panel-heading">
+          <div>
+            <div class="panel-kicker">Controlled workflow</div>
+            <h2 id="workflowTitle">One orchestrator · explicit checkpoints</h2>
+          </div>
+          <span class="status" id="runStatus" aria-live="polite">Ready to start</span>
+        </div>
+
+        <div class="workflow-wrap">
+          <div class="workflow" id="workflow" aria-label="Workflow stages">
+            <div class="workflow-progress" id="workflowProgress"></div>
+          </div>
+        </div>
+
+        <div class="current-step" id="currentStep" aria-live="polite" aria-atomic="true"></div>
+
+        <div class="controls">
+          <button class="quiet-button" id="previousButton" type="button">← Previous</button>
+          <button class="quiet-button" id="nextButton" type="button">Next stage →</button>
+          <span class="control-hint" id="controlHint">Run the simulation to begin. It will pause for human scope approval.</span>
+        </div>
+      </section>
+
+      <aside class="side-stack" aria-label="Change request details">
+        <section class="panel request-card">
+          <div class="request-head">
+            <div>
+              <div class="request-id" id="requestId"></div>
+              <h2 class="request-title" id="requestTitle"></h2>
+            </div>
+            <span class="status" id="requestStatus">Submitted</span>
+          </div>
+          <p class="request-desc" id="requestDescription"></p>
+          <div class="version-change">
+            <span class="version" id="oldVersion"></span><span class="arrow">→</span>
+            <span class="version new" id="newVersion"></span>
+            <span class="version-caption">proposed requirement<br>version after approval</span>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div><div class="panel-kicker">Run trace</div><h2>Persistent change record</h2></div>
+            <span class="panel-kicker" id="runId"></span>
+          </div>
+          <div class="trace-list" id="traceList"></div>
+        </section>
+
+        <section class="panel">
+          <div class="panel-heading">
+            <div><div class="panel-kicker">Illustrative efficiency</div><h2>Context stays relevant</h2></div>
+          </div>
+          <div class="impact-stats">
+            <div class="metric"><strong id="contextFiles">—</strong><span>Context files</span></div>
+            <div class="metric"><strong id="contextTokens">—</strong><span>Input tokens</span></div>
+            <div class="metric"><strong class="saving" id="tokenSaving">—</strong><span>vs. full load</span></div>
+          </div>
+          <p class="footnote">Example estimates only. A real run would measure actual context and token usage.</p>
+        </section>
+
+        <div class="principle"><b>AI prepares.</b><span>Rules calculate. Humans decide. Automation never approves or merges its own change.</span></div>
+      </aside>
+    </div>
+  </main>
+
+  <div class="toast" id="toast" role="status"></div>
+
+  <script>
+    const stages = [
+      { title: "Intake", description: "Capture the request and link it to the permanent requirement ID." },
+      { title: "Impact analysis", description: "Find affected requirements, dependencies, source files, tests, and risks." },
+      { title: "Human scope approval", description: "A person reviews the interpretation, acceptance criteria, and proposed boundaries." },
+      { title: "Build context", description: "Retrieve only the requirements, decisions, code, and tests needed for this change." },
+      { title: "Implement", description: "Give the coding agent an approved file scope and require it to report scope expansion." },
+      { title: "Validate", description: "Run targeted tests and dependency-based regression checks; record the evidence." },
+      { title: "Update traceability", description: "Save the new requirement version, implementation map, test evidence, and review status." }
+    ];
+
+    const scenarios = {
+      pdf: {
+        id: "CR-014 · REQ-008",
+        requirement: "REQ-008",
+        title: "Add PDF report export",
+        description: "Extend report export to PDF while preserving the existing CSV workflow.",
+        versionFrom: "v1.0",
+        versionTo: "v2.0",
+        requested: "Add PDF output. Keep CSV unchanged, apply active filters, and audit each export.",
+        dependency: ["REQ-009 · report filtering"],
+        files: ["src/reports/export-service.ts", "src/components/ExportButton.tsx"],
+        tests: ["tests/reports/export.spec.ts", "tests/reports/filters.spec.ts"],
+        constraints: ["Preserve CSV behavior", "Honor active filters", "Write an audit event"],
+        risk: "Medium · output and audit paths",
+        fileCount: "8",
+        tokens: "18.4k",
+        saving: "−66%",
+        baseline: "54k"
+      },
+      timeout: {
+        id: "CR-015 · REQ-004",
+        requirement: "REQ-004",
+        title: "Configure session timeout",
+        description: "Let administrators set an inactivity timeout within the approved security range.",
+        versionFrom: "v1.0",
+        versionTo: "v1.1",
+        requested: "Allow a 15–60 minute timeout. Keep the default at 30 minutes and warn 5 minutes before sign-out.",
+        dependency: ["REQ-002 · user session policy"],
+        files: ["src/auth/session-manager.ts", "src/config/security-settings.ts"],
+        tests: ["tests/auth/session-timeout.spec.ts", "tests/auth/session-policy.spec.ts"],
+        constraints: ["Reject values below 15 or above 60", "Default remains 30 minutes", "Do not interrupt active users"],
+        risk: "Medium · auth configuration",
+        fileCount: "7",
+        tokens: "16.1k",
+        saving: "−70%",
+        baseline: "54k"
+      }
+    };
+
+    const state = { index: -1, approval: "pending", timer: null, revisionRequested: false };
+    const workflow = document.querySelector("#workflow");
+    const currentStep = document.querySelector("#currentStep");
+    const traceList = document.querySelector("#traceList");
+    const runStatus = document.querySelector("#runStatus");
+    const requestStatus = document.querySelector("#requestStatus");
+    const runButton = document.querySelector("#runButton");
+    const nextButton = document.querySelector("#nextButton");
+    const previousButton = document.querySelector("#previousButton");
+    const controlHint = document.querySelector("#controlHint");
+    const scenarioSelect = document.querySelector("#scenario");
+    const toast = document.querySelector("#toast");
+    let toastTimer;
+
+    function activeScenario() { return scenarios[scenarioSelect.value]; }
+
+    function escapeHtml(value) {
+      return value.replace(/[&<>"']/g, char => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[char]);
+    }
+
+    function setStatus(element, label, kind = "") {
+      element.textContent = label;
+      element.className = `status${kind ? ` ${kind}` : ""}`;
+    }
+
+    function detail(label, value) {
+      return `<div class="detail"><small>${label}</small><strong>${escapeHtml(value)}</strong></div>`;
+    }
+
+    function tagList(values) {
+      return `<div class="tag-list">${values.map(value => `<span class="tag">${escapeHtml(value)}</span>`).join("")}</div>`;
+    }
+
+    function renderScenario() {
+      const data = activeScenario();
+      document.querySelector("#requestId").textContent = data.id;
+      document.querySelector("#requestTitle").textContent = data.title;
+      document.querySelector("#requestDescription").textContent = data.description;
+      document.querySelector("#oldVersion").textContent = data.versionFrom;
+      document.querySelector("#newVersion").textContent = data.versionTo;
+      document.querySelector("#runId").textContent = `RUN-26-10-${data.requirement.slice(-3)}`;
+      document.querySelector("#contextFiles").textContent = data.fileCount;
+      document.querySelector("#contextTokens").textContent = data.tokens;
+      document.querySelector("#tokenSaving").textContent = data.saving;
+      renderStep();
+      renderProgress();
+      renderTrace();
+      updateControls();
+    }
+
+    function renderProgress() {
+      workflow.querySelectorAll(".stage").forEach((node, i) => {
+        const finished = state.index === stages.length - 1;
+        node.classList.toggle("active", i === state.index && !finished);
+        node.classList.toggle("complete", state.index >= 0 && (i < state.index || (finished && i === state.index)));
+        node.classList.toggle("waiting", i === state.index && i === 2 && state.approval !== "approved");
+        const dot = node.querySelector(".stage-dot");
+        dot.textContent = state.index >= 0 && (i < state.index || (finished && i === state.index)) ? "✓" : String(i + 1).padStart(2, "0");
+        node.setAttribute("aria-current", i === state.index ? "step" : "false");
+      });
+      const progress = state.index < 0 ? 0 : state.index === stages.length - 1 ? 100 : Math.max(0, Math.min(100, (state.index / (stages.length - 1)) * 86));
+      document.querySelector("#workflowProgress").style.width = `${progress}%`;
+    }
+
+    function renderTrace() {
+      traceList.innerHTML = stages.map((stage, i) => {
+        const finished = state.index === stages.length - 1;
+        const isActive = i === state.index && !finished;
+        const isComplete = state.index >= 0 && (i < state.index || (finished && i === state.index));
+        const waiting = isActive && i === 2 && state.approval !== "approved";
+        const status = isComplete ? "Recorded" : waiting ? "Awaiting decision" : isActive ? "In progress" : "Queued";
+        const className = isComplete ? "complete" : waiting ? "waiting" : isActive ? "active" : "";
+        return `<div class="trace-item ${className}"><span class="trace-icon">${isComplete ? "✓" : i + 1}</span><span class="trace-label">${stage.title}</span><span class="trace-status">${status}</span></div>`;
+      }).join("");
+    }
+
+    function renderStep() {
+      if (state.index < 0) {
+        currentStep.innerHTML = `<div class="step-top"><span class="step-number">Ready</span></div><h3>Start with a change request</h3><p>Run the simulation to watch the orchestrator move through each controlled step. It pauses before implementation until a human approves the proposed scope.</p>`;
+        return;
+      }
+      const data = activeScenario();
+      const step = stages[state.index];
+      let content = "";
+      if (state.index === 0) {
+        content = `<div class="detail-grid">${detail("Requirement", data.requirement)}${detail("Request type", "Behavior change")}${detail("Requested behavior", data.requested)}${detail("Intake status", "Captured · original wording retained")}</div>`;
+      } else if (state.index === 1) {
+        content = `<div class="detail-grid">${detail("Dependent requirement", data.dependency.join(", "))}${detail("Risk estimate", data.risk)}<div class="detail"><small>Likely source files</small>${tagList(data.files)}</div><div class="detail"><small>Regression tests</small>${tagList(data.tests)}</div></div><div class="note-box">The requirement map is a starting point, not unquestioned truth. The analyzer also checks the code structure and reports any mapping mismatch.</div>`;
+      } else if (state.index === 2) {
+        content = `<div class="detail-grid">${detail("Proposed acceptance criteria", data.constraints.join(" · "))}${detail("Proposed implementation scope", `${data.files.length} source files · ${data.tests.length} test files`)}${detail("Decision owner", "Product / engineering reviewer")}${detail("AI authority", "No approval, merge, or requirement completion")}</div>
+          <div class="approval"><strong>Human checkpoint · review before coding</strong><p>Approve the interpretation and bounded file scope, or request clarification. The coding step cannot proceed until you explicitly approve.</p>
+            <div class="decision-row"><button class="decision-button" id="approveButton" type="button">${state.revisionRequested ? "Approve revised scope & continue" : "Approve scope & continue"}</button><button class="decision-button secondary" id="revisionButton" type="button">Request clarification</button></div>
+            <div class="revision-message ${state.revisionRequested ? "visible" : ""}" id="revisionMessage">${state.revisionRequested ? "Paused for human clarification. Update the request and approve the scope to continue." : ""}</div>
+          </div>`;
+      } else if (state.index === 3) {
+        content = `<div class="detail-grid">${detail("Requirements loaded", `${data.requirement} + ${data.dependency[0].split(" · ")[0]}`)}${detail("Estimated context", `${data.fileCount} relevant files · ${data.tokens} input tokens`)}${detail("Full-repository estimate", `${data.baseline} tokens (illustrative)`)}${detail("Estimated reduction", `${data.saving} by targeted retrieval`)}</div><div class="note-box">Expand retrieval only if mappings are unreliable, architecture is cross-cutting, or targeted tests expose unexpected impact.</div>`;
+      } else if (state.index === 4) {
+        content = `<div class="detail-grid"><div class="detail"><small>Approved file boundary</small>${tagList([...data.files, ...data.tests])}</div>${detail("Coding-agent instruction", "Stop and request approval before expanding scope")}${detail("Unchanged behavior", data.constraints[0])}${detail("Human review", "Required after implementation")}</div><div class="note-box">The agent may request an extra file with a reason and linked requirement. The orchestrator updates impact analysis; it does not silently widen the work package.</div>`;
+      } else if (state.index === 5) {
+        content = `<div class="detail-grid">${detail("Targeted checks", `${data.tests.length} focused test suites`)}${detail("Dependency regression", data.dependency[0])}${detail("Acceptance criteria", `${data.constraints.length} checked against the change`)}${detail("Outcome", "All simulated checks passed")}</div><div class="note-box">A real run must show actual test output. Passing a sample animation is not evidence of a real implementation.</div>`;
+      } else {
+        content = `<div class="detail-grid">${detail("Requirement record", `${data.requirement} · ${data.versionFrom} → ${data.versionTo}`)}${detail("Implementation map", "Source files and tests reconciled")}${detail("Validation evidence", "Test results attached to change record")}${detail("Final status", "Ready for human code review")}</div><div class="note-box">The requirement is not marked complete until validation evidence exists and a human has reviewed the change.</div>`;
+      }
+      currentStep.innerHTML = `<div class="step-top"><span class="step-number">Step ${String(state.index + 1).padStart(2, "0")} / 07</span>${state.index === 2 ? '<span class="gate-tag">Human approval gate</span>' : ""}</div><h3>${step.title}</h3><p>${step.description}</p><div class="step-content">${content}</div>`;
+      document.querySelector("#approveButton")?.addEventListener("click", approveScope);
+      document.querySelector("#revisionButton")?.addEventListener("click", requestRevision);
+    }
+
+    function updateControls() {
+      const waitingForApproval = state.index === 2 && state.approval !== "approved";
+      const complete = state.index === stages.length - 1;
+      nextButton.disabled = state.index < 0 || waitingForApproval || complete;
+      previousButton.disabled = state.index <= 0;
+      runButton.textContent = state.timer ? "Ⅱ Pause simulation" : state.index === -1 ? "▶ Run simulation" : complete ? "✓ Simulation complete" : "▶ Continue simulation";
+      runButton.disabled = complete || waitingForApproval;
+      if (waitingForApproval) controlHint.textContent = "Paused · human approval is required before coding.";
+      else if (complete) controlHint.textContent = "Complete · ready for human code review.";
+      else if (state.index < 0) controlHint.textContent = "Run the simulation to begin. It will pause for human scope approval.";
+      else controlHint.textContent = "Advance one stage or run the remaining simulation.";
+    }
+
+    function goTo(index) {
+      state.index = Math.max(-1, Math.min(index, stages.length - 1));
+      if (state.index === 2 && state.approval === "pending") setStatus(runStatus, "Awaiting human approval");
+      else if (state.index === stages.length - 1) setStatus(runStatus, "Ready for review", "done");
+      else if (state.index >= 0) setStatus(runStatus, "Workflow in progress", "running");
+      else setStatus(runStatus, "Ready to start");
+      setStatus(requestStatus, state.index >= 6 ? "Validation recorded" : state.index >= 2 ? "Impact analyzed" : "Submitted", state.index >= 6 ? "done" : "");
+      renderProgress();
+      renderTrace();
+      renderStep();
+      updateControls();
+    }
+
+    function advance() {
+      if (state.index === -1) goTo(0);
+      else if (state.index !== 2 || state.approval === "approved") goTo(state.index + 1);
+    }
+
+    function approveScope() {
+      state.approval = "approved";
+      state.revisionRequested = false;
+      showToast("Scope approved by human reviewer. Continuing to context assembly.");
+      goTo(3);
+    }
+
+    function requestRevision() {
+      state.approval = "revision";
+      state.revisionRequested = true;
+      clearInterval(state.timer);
+      state.timer = null;
+      setStatus(runStatus, "Clarification requested", "blocked");
+      renderStep();
+      renderTrace();
+      updateControls();
+      showToast("Simulation paused. The request needs clarification before coding.");
+    }
+
+    function toggleRun() {
+      if (state.timer) {
+        clearInterval(state.timer);
+        state.timer = null;
+        setStatus(runStatus, "Simulation paused");
+        updateControls();
+        return;
+      }
+      if (state.index === -1) advance();
+      if (state.index === 2 && state.approval !== "approved") return;
+      setStatus(runStatus, "Workflow in progress", "running");
+      updateControls();
+      state.timer = setInterval(() => {
+        if (state.index >= stages.length - 1 || state.index === 2) {
+          clearInterval(state.timer);
+          state.timer = null;
+          if (state.index === 2) setStatus(runStatus, "Awaiting human approval");
+          updateControls();
+          return;
+        }
+        goTo(state.index + 1);
+        if (state.index === 2) {
+          clearInterval(state.timer);
+          state.timer = null;
+          setStatus(runStatus, "Awaiting human approval");
+          updateControls();
+        } else if (state.index === stages.length - 1) {
+          clearInterval(state.timer);
+          state.timer = null;
+          updateControls();
+        }
+      }, 1450);
+    }
+
+    function reset() {
+      clearInterval(state.timer);
+      state.timer = null;
+      state.index = -1;
+      state.approval = "pending";
+      state.revisionRequested = false;
+      renderScenario();
+      setStatus(runStatus, "Ready to start");
+      setStatus(requestStatus, "Submitted");
+    }
+
+    function showToast(message) {
+      toast.textContent = message;
+      toast.classList.add("visible");
+      clearTimeout(toastTimer);
+      toastTimer = setTimeout(() => toast.classList.remove("visible"), 2800);
+    }
+
+    stages.forEach((stage, i) => {
+      const button = document.createElement("button");
+      button.type = "button";
+      button.className = "stage";
+      button.setAttribute("aria-label", `Go to ${stage.title}`);
+      button.innerHTML = `<span class="stage-dot">${String(i + 1).padStart(2, "0")}</span><span class="stage-label">${stage.title}</span>`;
+      button.addEventListener("click", () => {
+        if (i > state.index + 1) {
+          showToast("Complete the earlier workflow stages before jumping ahead.");
+          return;
+        }
+        if (i > 2 && state.approval !== "approved") {
+          showToast("Approve the proposed scope before viewing implementation stages.");
+          return;
+        }
+        goTo(i);
+      });
+      workflow.append(button);
+    });
+
+    runButton.addEventListener("click", toggleRun);
+    nextButton.addEventListener("click", advance);
+    previousButton.addEventListener("click", () => goTo(state.index - 1));
+    document.querySelector("#resetButton").addEventListener("click", reset);
+    scenarioSelect.addEventListener("change", reset);
+    document.querySelector("#themeButton").addEventListener("click", () => {
+      const html = document.documentElement;
+      const dark = html.dataset.theme !== "dark";
+      html.dataset.theme = dark ? "dark" : "light";
+      document.querySelector("#themeButton").textContent = dark ? "☼ Theme" : "◐ Theme";
+    });
+
+    renderScenario();
+  </script>
+</body>
+</html>
