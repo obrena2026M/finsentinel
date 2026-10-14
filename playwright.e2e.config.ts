@@ -1,4 +1,7 @@
+import { join } from 'node:path';
 import { defineConfig, devices } from '@playwright/test';
+
+const reportDir = process.env.FINSENTINEL_E2E_REPORT_DIR;
 
 export default defineConfig({
   testDir: 'tests/e2e',
@@ -9,8 +12,8 @@ export default defineConfig({
   retries: 0,
   reporter: [
     ['list'],
-    ['html', { open: 'never', outputFolder: 'playwright-report-e2e' }],
-    ['json', { outputFile: 'test-results/e2e-results.json' }],
+    ['html', { open: 'never', outputFolder: reportDir ?? 'playwright-report-e2e' }],
+    ['json', { outputFile: reportDir ? join(reportDir, 'results.json') : 'test-results/e2e-results.json' }],
   ],
   timeout: 90_000,
   use: { baseURL: 'http://localhost:3100' },

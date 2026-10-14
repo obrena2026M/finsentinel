@@ -1,0 +1,481 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FinSentinel — Stage 05 Database Deployment &amp; Seeding</title>
+<meta name="description" content="Interactive database deployment, migration and seeding workflow for FinSentinel. Standalone; no external resources.">
+<style>
+  :root {
+    color-scheme: light dark;
+    --bg: #f4f6f9; --surface: #fff; --sunken: #e9edf2; --text: #0f172a;
+    --muted: #475569; --border: #d6dde6; --strong: #b6c2d1; --edge: #c7d0db;
+    --shadow: 0 8px 24px rgba(15, 23, 42, .1);
+    --blue: #1d4ed8; --blue-tint: #dbeafe; --teal: #0f766e; --teal-tint: #ccfbf1;
+    --green: #047857; --green-tint: #d1fae5; --amber: #b45309; --amber-tint: #fef3c7;
+    --red: #b91c1c; --red-tint: #fee2e2; --purple: #6d28d9; --purple-tint: #ede9fe;
+    --duration: 800ms;
+    font-family: "Segoe UI", system-ui, -apple-system, Roboto, Arial, sans-serif;
+  }
+  [data-theme="dark"] {
+    --bg: #0f151c; --surface: #171f29; --sunken: #0b1016; --text: #e6edf5;
+    --muted: #9fb0c3; --border: #27323f; --strong: #3a4756; --edge: #35414f;
+    --shadow: 0 8px 24px rgba(0, 0, 0, .45);
+    --blue-tint: #142a5c; --teal-tint: #0d3b36; --green-tint: #0c3b2d;
+    --amber-tint: #4a2d07; --red-tint: #4a1515; --purple-tint: #2d1b5e;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0f151c; --surface: #171f29; --sunken: #0b1016; --text: #e6edf5;
+      --muted: #9fb0c3; --border: #27323f; --strong: #3a4756; --edge: #35414f;
+      --shadow: 0 8px 24px rgba(0, 0, 0, .45);
+      --blue-tint: #142a5c; --teal-tint: #0d3b36; --green-tint: #0c3b2d;
+      --amber-tint: #4a2d07; --red-tint: #4a1515; --purple-tint: #2d1b5e;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; padding: 24px clamp(14px, 3vw, 42px) 40px; background: var(--bg); color: var(--text); }
+  header { display: flex; flex-wrap: wrap; align-items: end; justify-content: space-between; gap: 16px 24px; margin: 0 auto 18px; max-width: 1500px; }
+  h1 { margin: 0 0 5px; font-size: clamp(21px, 2.6vw, 30px); letter-spacing: -.02em; }
+  h1 small { display: block; margin-top: 5px; color: var(--muted); font-size: .52em; font-weight: 500; letter-spacing: 0; }
+  .tagline { max-width: 800px; margin: 0; color: var(--muted); font-size: 14px; line-height: 1.55; }
+  .controls { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
+  button, select { font: inherit; color: var(--text); background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 11px; }
+  button { cursor: pointer; }
+  button:hover, select:hover { border-color: var(--strong); }
+  button:focus-visible, select:focus-visible, a:focus-visible, summary:focus-visible { outline: 3px solid var(--blue); outline-offset: 2px; }
+  button.primary { color: white; background: var(--blue); border-color: var(--blue); font-weight: 700; }
+  main { max-width: 1500px; margin: auto; }
+  .overview { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 390px); gap: 16px; align-items: start; }
+  .card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; box-shadow: var(--shadow); }
+  .flow-card { padding: clamp(16px, 2vw, 24px); }
+  .section-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 13px; }
+  .section-head h2, .content-section h2 { margin: 0; font-size: 18px; }
+  .status { color: var(--muted); font-size: 13px; }
+  .progress { height: 6px; overflow: hidden; background: var(--sunken); border-radius: 999px; margin: 0 0 19px; }
+  .progress span { display: block; width: 0; height: 100%; background: var(--blue); border-radius: inherit; transition: width 350ms ease; }
+  .steps { display: grid; grid-template-columns: repeat(4, minmax(140px, 1fr)); gap: 12px; }
+  .step {
+    position: relative; min-height: 132px; padding: 15px 14px; text-align: left; border: 1px solid var(--border);
+    border-top: 4px solid var(--step-color, var(--blue)); border-radius: 12px; background: var(--surface);
+    transition: transform 220ms ease, background-color 220ms ease, border-color 220ms ease;
+  }
+  .step:hover { transform: translateY(-2px); }
+  .step.active { border-color: var(--step-color, var(--blue)); background: var(--step-tint, var(--blue-tint)); box-shadow: 0 0 0 2px color-mix(in srgb, var(--step-color, var(--blue)) 22%, transparent); }
+  .step.done .number { background: var(--green); }
+  .number { display: inline-grid; width: 25px; height: 25px; place-items: center; margin-bottom: 9px; color: white; background: var(--step-color, var(--blue)); border-radius: 50%; font-size: 12px; font-weight: 800; }
+  .step strong { display: block; margin-bottom: 5px; font-size: 14px; }
+  .step small { display: block; color: var(--muted); font-size: 12px; line-height: 1.4; }
+  .branch { display: grid; grid-template-columns: minmax(0, 1fr) minmax(230px, .7fr); gap: 12px; margin-top: 14px; }
+  .branch-box { padding: 14px 16px; border: 1px dashed var(--amber); border-radius: 12px; background: var(--amber-tint); }
+  .branch-box.failure { border-color: var(--red); background: var(--red-tint); }
+  .branch-box h3 { margin: 0 0 5px; font-size: 14px; }
+  .branch-box p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+  .branch-box button { margin-top: 9px; padding: 5px 9px; font-size: 12px; }
+  .detail { position: sticky; top: 14px; padding: 20px; }
+  .detail-head { display: flex; align-items: start; gap: 10px; }
+  .badge { flex: 0 0 auto; padding: 4px 9px; border-radius: 999px; color: white; background: var(--blue); font-size: 11px; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+  .detail h2 { margin: 1px 0 0; font-size: 17px; }
+  .detail .ids { margin: 9px 0 12px; color: var(--muted); font-size: 12px; }
+  .detail p { margin: 9px 0; font-size: 14px; line-height: 1.55; }
+  .detail dl { display: grid; grid-template-columns: 82px minmax(0, 1fr); gap: 6px 10px; margin: 13px 0 0; font-size: 13px; line-height: 1.45; }
+  .detail dt { color: var(--muted); font-weight: 700; }
+  .detail dd { margin: 0; overflow-wrap: anywhere; }
+  code { padding: 1px 5px; border-radius: 4px; background: var(--sunken); font-family: Consolas, "Cascadia Mono", monospace; font-size: .92em; }
+  .notice { margin-top: 12px !important; padding: 10px 12px; border-left: 3px solid var(--amber); border-radius: 5px; background: var(--amber-tint); font-size: 13px !important; }
+  .content-section { margin-top: 24px; padding: clamp(17px, 2.5vw, 26px); }
+  .content-section > p { max-width: 1000px; color: var(--muted); font-size: 14px; line-height: 1.65; }
+  .data-grid, .target-grid, .guard-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; margin-top: 14px; }
+  .info { padding: 15px; border: 1px solid var(--border); border-radius: 11px; background: var(--bg); }
+  .info h3 { margin: 0 0 7px; font-size: 15px; }
+  .info p, .info li { color: var(--muted); font-size: 13px; line-height: 1.55; }
+  .info p { margin: 6px 0; }
+  .info ul { margin: 7px 0 0; padding-left: 18px; }
+  .info .label { display: inline-block; margin-bottom: 6px; color: var(--muted); font-size: 10px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+  .info.supported { border-left: 4px solid var(--green); }
+  .info.conditional { border-left: 4px solid var(--amber); }
+  .info.unsupported { border-left: 4px solid var(--red); }
+  .current { border-left: 4px solid var(--teal); }
+  .future { border-left: 4px solid var(--purple); }
+  .sequence { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; margin-top: 15px; counter-reset: seq; }
+  .sequence div { position: relative; min-height: 92px; padding: 13px 13px 13px 43px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--muted); font-size: 13px; line-height: 1.5; counter-increment: seq; }
+  .sequence div::before { content: counter(seq); position: absolute; left: 12px; top: 12px; display: grid; width: 23px; height: 23px; place-items: center; border-radius: 50%; color: white; background: var(--blue); font-weight: 800; font-size: 11px; }
+  .sequence strong { display: block; margin-bottom: 3px; color: var(--text); }
+  details { margin-top: 12px; padding: 13px 15px; border: 1px solid var(--border); border-radius: 10px; background: var(--bg); }
+  summary { cursor: pointer; font-weight: 700; font-size: 14px; }
+  details p, details li { color: var(--muted); font-size: 13px; line-height: 1.6; }
+  details code { overflow-wrap: anywhere; }
+  .trace { color: var(--muted); font-size: 12px; }
+  footer { max-width: 1500px; margin: 18px auto 0; color: var(--muted); font-size: 12px; line-height: 1.6; }
+  footer a { color: var(--blue); }
+  @media (max-width: 1050px) { .overview { grid-template-columns: 1fr; } .detail { position: static; } .steps { grid-template-columns: repeat(4, minmax(130px, 1fr)); } }
+  @media (max-width: 720px) { .steps { grid-template-columns: repeat(2, minmax(0, 1fr)); } .branch, .data-grid, .target-grid, .guard-grid { grid-template-columns: 1fr; } .sequence { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 430px) { .steps { grid-template-columns: 1fr; } .sequence { grid-template-columns: 1fr; } .controls { width: 100%; } }
+  @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; } }
+</style>
+</head>
+<body>
+<header>
+  <div>
+    <h1>FinSentinel — Stage 05 Database Deployment &amp; Seeding
+      <small>Financial Crime Risk Assessment Workbench · AI prepares. Rules calculate. Humans decide.</small>
+    </h1>
+    <p class="tagline">Current support: SQLite. Back up, migrate, initialize approved reference data, gate demo fixtures, then verify the release. Click any step for details; use the controls to walk through the sequence.</p>
+  </div>
+  <div class="controls" role="group" aria-label="Workflow controls">
+    <button id="play" class="primary" type="button">Play</button>
+    <button id="restart" type="button">Restart</button>
+    <button id="prev" type="button" aria-label="Previous step">Previous</button>
+    <button id="next" type="button" aria-label="Next step">Next</button>
+    <select id="speed" aria-label="Animation speed">
+      <option value="1500">Slow</option><option value="850" selected>Normal</option><option value="400">Fast</option>
+    </select>
+    <button id="theme" type="button" aria-pressed="false">Toggle theme</button>
+  </div>
+</header>
+
+<main>
+  <section class="overview" aria-label="Interactive database deployment flow">
+    <div class="card flow-card">
+      <div class="section-head">
+        <h2>Release-to-database workflow</h2>
+        <span class="status" id="status" aria-live="polite">Select a step to inspect it.</span>
+      </div>
+      <div class="progress" role="progressbar" aria-label="Workflow progress" aria-valuemin="0" aria-valuemax="8" aria-valuenow="0"><span id="progress"></span></div>
+      <div class="steps" id="steps" aria-label="Deployment steps"></div>
+      <div class="branch">
+        <div class="branch-box" id="demo-branch">
+          <h3>Conditional branch · synthetic demo cases</h3>
+          <p>Staging/local only when explicitly enabled. Production default is off; never seed real customer data from demo fixtures.</p>
+          <button type="button" data-step="5">Inspect seed gate</button>
+        </div>
+        <div class="branch-box failure">
+          <h3>Failure path · recovery plan</h3>
+          <p>Migration, seed or smoke failure blocks promotion. Restore or forward-fix according to the engine's tested recovery plan.</p>
+          <button type="button" id="rollback">Inspect recovery</button>
+        </div>
+      </div>
+    </div>
+    <aside class="card detail" aria-live="polite" aria-atomic="true">
+      <div class="detail-head"><span class="badge" id="kind">Overview</span><h2 id="title">What this workflow supports</h2></div>
+      <div class="ids" id="ids">STAGE05 · DEP-07 · DEP-09…11 · DEP-14</div>
+      <div id="description">
+        <p>Yes, a database deployment workflow can apply migrations and approved seed data to local or cloud-hosted databases, provided the application supports the target database engine.</p>
+        <p>FinSentinel currently uses SQLite. A SQLite file on suitable durable cloud storage is a different deployment profile from a managed PostgreSQL or MySQL service.</p>
+        <p>Choose a step to see its operator, checks and safeguards.</p>
+      </div>
+    </aside>
+  </section>
+
+  <section class="card content-section">
+    <h2>What happens today</h2>
+    <p>The SQLite database is selected by <code>DB_PATH</code> and stored outside release folders by the current Windows deployment profile. At app startup, versioned schema migrations run and reference data is initialized. Demo-case fixtures are controlled separately.</p>
+    <div class="data-grid">
+      <article class="info current">
+        <span class="label">Schema migrations</span>
+        <h3>Versioned and automatic</h3>
+        <p><code>runMigrations()</code> applies ordered SQL files that are not yet recorded in <code>schema_migrations</code>. Each migration is transactional; an error aborts startup.</p>
+      </article>
+      <article class="info current">
+        <span class="label">Reference data</span>
+        <h3>Initialized at startup</h3>
+        <p><code>seedReference()</code> adds missing synthetic role users, the initial risk model, prompt versions and policy corpus data. It does not add demo cases.</p>
+      </article>
+      <article class="info conditional">
+        <span class="label">Demo cases</span>
+        <h3>Separate, explicit opt-in</h3>
+        <p><code>SEED_ON_START=1</code> asks the server to create demo cases. The deploy script sets this off by default in production and enables seeding in a newly configured staging environment. Existing <code>shared\.env</code> values are not overwritten by later deploys.</p>
+      </article>
+      <article class="info current">
+        <span class="label">SQLite recovery</span>
+        <h3>File-based backup and restore</h3>
+        <p>The release script takes a pre-deploy backup using the SQLite backup command and can restore that file on rollback. This mechanism is SQLite-specific.</p>
+      </article>
+    </div>
+    <details>
+      <summary>Commands and implementation files</summary>
+      <p>Local developer commands include <code>npm run migrate</code> and <code>npm run seed</code>; both use the configured <code>DB_PATH</code>. The latter creates synthetic demo cases and is not a generic production initialization command.</p>
+      <p>Implementation: <code>src/db/connection.ts</code>, <code>src/db/seed.ts</code>, <code>src/server.ts</code>, <code>scripts/seed.ts</code>, <code>scripts/backup.ts</code>, <code>scripts/restore.ts</code>, and <code>scripts/deploy.ps1</code>.</p>
+      <p class="notice"><strong>Known guard caveat:</strong> The CLI seed script currently checks whether <code>ALLOW_SEED</code> is non-empty. Therefore values such as <code>0</code> or <code>false</code> pass that check. Do not run <code>npm run seed</code> in production or wire it into a production workflow until the guard is hardened.</p>
+    </details>
+  </section>
+
+  <section class="card content-section">
+    <h2>What “cloud database” means here</h2>
+    <p>A cloud location does not automatically imply compatibility. Validate the storage/database engine and its operational guarantees before allowing writes.</p>
+    <div class="target-grid">
+      <article class="info supported">
+        <span class="label">Supported today</span>
+        <h3>Local SQLite</h3>
+        <p>Use the existing SQLite adapter and scripts with a persistent local file. Keep the database outside the immutable release directory.</p>
+      </article>
+      <article class="info conditional">
+        <span class="label">Conditional</span>
+        <h3>SQLite on cloud-hosted compute/storage</h3>
+        <p>Potentially usable only if storage durability, SQLite locking/WAL behavior, single-writer access, backup and restore have been validated. Do not assume a network share is safe for SQLite.</p>
+      </article>
+      <article class="info unsupported">
+        <span class="label">Not supported today</span>
+        <h3>Managed PostgreSQL, MySQL or another engine</h3>
+        <p>A workflow alone cannot add compatibility. Do not point the current SQLite deployment at a non-SQLite service.</p>
+      </article>
+      <article class="info future">
+        <span class="label">Required before enablement</span>
+        <h3>Engine adapter and operational parity</h3>
+        <p>Implement and test the driver, migrations, transactions, locking, full-text search, seeding, backup and restore for that engine before adding its workflow job.</p>
+      </article>
+    </div>
+  </section>
+
+  <section class="card content-section">
+    <h2>Recommended workflow after another engine is supported</h2>
+    <p>For multi-instance deployments, use one protected migration job with an exclusive migration lock. Keep schema changes, reference-data initialization and demo fixtures as distinct operations.</p>
+    <div class="sequence" aria-label="Future provider-aware deployment sequence">
+      <div><strong>Verify release</strong>CI and review gates pass; use a versioned release.</div>
+      <div><strong>Select target</strong>Choose a protected environment and supported engine.</div>
+      <div><strong>Validate identity</strong>Check engine, target, connectivity and least-privilege permissions.</div>
+      <div><strong>Back up</strong>Create a provider-appropriate recovery point before writes.</div>
+      <div><strong>Migrate once</strong>Apply pending migrations with concurrency protection.</div>
+      <div><strong>Seed references</strong>Apply only reviewed, idempotent reference data.</div>
+      <div><strong>Verify database</strong>Check schema version, expected data and database health.</div>
+      <div><strong>Deploy and smoke-test</strong>Verify readiness and the new release identity.</div>
+    </div>
+    <details>
+      <summary>Demo-fixture decision</summary>
+      <p><strong>Local or staging + explicit opt-in:</strong> synthetic demo cases may be seeded. <strong>Otherwise:</strong> skip demo fixtures. Production demo-case seeding is not part of routine releases and must remain off by default (DEP-07, NFR-SEC-10).</p>
+    </details>
+  </section>
+
+  <section class="card content-section">
+    <h2>Safety and recovery gates</h2>
+    <div class="guard-grid">
+      <article class="info">
+        <h3>Separate data classes</h3>
+        <p>Migrations, reference data and demo fixtures have different purposes. Seeds must never overwrite operational cases, evidence, assessments, decisions or audit data.</p>
+      </article>
+      <article class="info">
+        <h3>Repeatable and reviewed</h3>
+        <p>Use stable keys/version identifiers and safe rerun behavior. Keep migration and seed definitions in reviewed source control; never execute SQL supplied as workflow input.</p>
+      </article>
+      <article class="info">
+        <h3>Protect credentials and target</h3>
+        <p>Store credentials in a protected secret store, scope them to the target, redact logs and assert environment plus database identity before writing. Do not accept arbitrary connection strings from workflow inputs.</p>
+      </article>
+      <article class="info">
+        <h3>Fail closed</h3>
+        <p>Connection, permission, migration, seed or verification failures must fail the job and block promotion. Never silently skip a requested database change.</p>
+      </article>
+      <article class="info">
+        <h3>Account for schema rollback</h3>
+        <p>Restoring application code does not necessarily reverse schema changes. Use backward-compatible expand/contract migrations or a tested restore/forward-fix plan.</p>
+      </article>
+      <article class="info">
+        <h3>Serialize writes</h3>
+        <p>Prevent concurrent releases or app instances from applying the same migration or seed at once. Prefer a one-off migration job where runtime startup is not safe.</p>
+      </article>
+    </div>
+    <p class="trace">Traceability: DEP-07 (seed control), DEP-09 (smoke test), DEP-10 (backup), DEP-11 (rollback), DEP-14 (secrets), NFR-OPS-07 (recovery), NFR-SEC-10 (synthetic data only). Source: <a href="./STAGE05_DB_Deployment_Workflow.md">STAGE05_DB_Deployment_Workflow.md</a>.</p>
+  </section>
+</main>
+
+<footer>Standalone interactive page; no external resources. Theme follows the operating-system preference unless toggled. Animation respects reduced-motion settings. Source of truth: <a href="./STAGE05_DB_Deployment_Workflow.md">database workflow document</a> and <a href="./STAGE05_Deployment.md">Stage 05 deployment plan</a>.</footer>
+
+<script>
+(() => {
+  const steps = [
+    {
+      title: 'Verify release', short: 'CI, review and versioned release', kind: 'Release', color: 'var(--blue)', tint: 'var(--blue-tint)',
+      ids: 'DEP-02 · DEP-03 · DEP-06',
+      text: 'Start from a reviewed, versioned release that has passed the CI gate. Deploy to staging first; production requires the configured human approval.',
+      who: 'GitHub Actions and release approver',
+      check: 'Release tag, successful verification, staging result and required production approval.'
+    },
+    {
+      title: 'Select and validate target', short: 'Environment, engine and identity', kind: 'Safeguard', color: 'var(--teal)', tint: 'var(--teal-tint)',
+      ids: 'DEP-04 · DEP-05 · DEP-14',
+      text: 'Choose the protected environment and supported database target. Confirm the database engine, target identity, connectivity and least-privilege permissions before any write.',
+      who: 'Deployment workflow and operator',
+      check: 'Current support is SQLite. A managed non-SQLite database must be rejected until its adapter and operations are implemented.'
+    },
+    {
+      title: 'Create recovery point', short: 'Backup before database changes', kind: 'Backup', color: 'var(--green)', tint: 'var(--green-tint)',
+      ids: 'DEP-10 · NFR-OPS-07',
+      text: 'Take and verify a backup before migrations or release changes. The existing Windows deployment takes an online SQLite backup before switching releases.',
+      who: 'Deployment script and database-specific backup tooling',
+      check: 'Confirm backup location, timestamp and restore usability. VACUUM INTO and file replacement are SQLite-specific.'
+    },
+    {
+      title: 'Apply versioned migrations', short: 'Ordered, transactional, serialized', kind: 'Migration', color: 'var(--purple)', tint: 'var(--purple-tint)',
+      ids: 'AD-01 · DEP-09',
+      text: 'Apply only pending, reviewed migrations using the application adapter. Current SQLite migrations run at app startup and are recorded in schema_migrations.',
+      who: 'Current: application startup. Future multi-instance engines: one-off migration job.',
+      check: 'Serialize migration writers. A migration error must stop startup/job and block promotion.'
+    },
+    {
+      title: 'Initialize reference data', short: 'Idempotent application baseline', kind: 'Reference data', color: 'var(--teal)', tint: 'var(--teal-tint)',
+      ids: 'AD-01 · NFR-SEC-10',
+      text: 'Initialize only the approved, non-case reference data required by the application. Today seedReference() inserts missing synthetic role users, the risk model, prompt versions and policy corpus data at startup.',
+      who: 'Current application startup; future engine-specific seed command',
+      check: 'Use stable keys or version identifiers, report changes and never overwrite operational cases, decisions or audit history.'
+    },
+    {
+      title: 'Apply demo fixtures?', short: 'Explicit non-production opt-in only', kind: 'Conditional', color: 'var(--amber)', tint: 'var(--amber-tint)',
+      ids: 'DEP-07 · NFR-SEC-10',
+      text: 'Treat demo cases as a separate optional operation. Local or staging can opt in to synthetic fixtures; otherwise skip them. Production remains off by default.',
+      who: 'Environment policy and approved operator',
+      check: 'Current production startup guard requires ALLOW_SEED=1 when SEED_ON_START=1. Never seed real customer data from fixtures.',
+      warning: 'Known CLI caveat: scripts/seed.ts currently treats any non-empty ALLOW_SEED value—including 0 or false—as permission. Do not run npm run seed in production until hardened.'
+    },
+    {
+      title: 'Verify database state', short: 'Schema, reference data and health', kind: 'Verification', color: 'var(--green)', tint: 'var(--green-tint)',
+      ids: 'DEP-09',
+      text: 'Check the expected migration version, reference-data invariants and database health. Report useful counts or checksums without exposing credentials.',
+      who: 'Deployment workflow and database health checks',
+      check: 'A failed or incomplete verification blocks release promotion; do not silently treat it as a success.'
+    },
+    {
+      title: 'Deploy and smoke-test', short: 'Readiness and release identity', kind: 'Deploy', color: 'var(--blue)', tint: 'var(--blue-tint)',
+      ids: 'DEP-08 · DEP-09',
+      text: 'Start the new application release and run its health and smoke checks. Current deployment verifies readiness and the responding release identity.',
+      who: 'Release deployment workflow',
+      check: 'Do not promote unless the new release answers successfully and the smoke tests pass.'
+    }
+  ];
+  const list = document.getElementById('steps');
+  const progress = document.getElementById('progress');
+  const progressBar = progress.parentElement;
+  const status = document.getElementById('status');
+  const detail = {
+    kind: document.getElementById('kind'), title: document.getElementById('title'),
+    ids: document.getElementById('ids'), body: document.getElementById('description')
+  };
+  const cards = steps.map((step, index) => {
+    const button = document.createElement('button');
+    button.type = 'button';
+    button.className = 'step';
+    button.style.setProperty('--step-color', step.color);
+    button.style.setProperty('--step-tint', step.tint);
+    button.setAttribute('aria-label', `Step ${index + 1}: ${step.title}`);
+    const number = document.createElement('span');
+    number.className = 'number';
+    number.textContent = String(index + 1);
+    const title = document.createElement('strong');
+    title.textContent = step.title;
+    const short = document.createElement('small');
+    short.textContent = step.short;
+    button.append(number, title, short);
+    button.addEventListener('click', () => select(index, true));
+    list.append(button);
+    return button;
+  });
+  let current = -1;
+  let timer = 0;
+  let speed = Number(document.getElementById('speed').value);
+  let playing = false;
+  const play = document.getElementById('play');
+
+  function showDetails(step) {
+    detail.kind.textContent = step.kind;
+    detail.kind.style.background = step.color;
+    detail.title.textContent = step.title;
+    detail.ids.textContent = step.ids;
+    detail.body.replaceChildren();
+    const paragraph = document.createElement('p');
+    paragraph.textContent = step.text;
+    const facts = document.createElement('dl');
+    const whoTerm = document.createElement('dt');
+    whoTerm.textContent = 'Owner';
+    const whoValue = document.createElement('dd');
+    whoValue.textContent = step.who;
+    const checkTerm = document.createElement('dt');
+    checkTerm.textContent = 'Gate';
+    const checkValue = document.createElement('dd');
+    checkValue.textContent = step.check;
+    facts.append(whoTerm, whoValue, checkTerm, checkValue);
+    detail.body.append(paragraph, facts);
+    if (step.warning) {
+      const warning = document.createElement('p');
+      warning.className = 'notice';
+      warning.textContent = step.warning;
+      detail.body.append(warning);
+    }
+  }
+  function select(index, stop) {
+    if (stop) pause();
+    current = Math.max(0, Math.min(index, steps.length - 1));
+    cards.forEach((card, i) => {
+      card.classList.toggle('active', i === current);
+      card.classList.toggle('done', i < current);
+      if (i === current) card.setAttribute('aria-current', 'step');
+      else card.removeAttribute('aria-current');
+    });
+    progress.style.width = `${((current + 1) / steps.length) * 100}%`;
+    progressBar.setAttribute('aria-valuenow', String(current + 1));
+    status.textContent = `Step ${current + 1} of ${steps.length} · ${steps[current].title}`;
+    showDetails(steps[current]);
+  }
+  function pause() {
+    playing = false;
+    window.clearTimeout(timer);
+    play.textContent = 'Play';
+    play.setAttribute('aria-pressed', 'false');
+  }
+  function advance() {
+    if (!playing) return;
+    if (current >= steps.length - 1) {
+      pause();
+      status.textContent = 'Workflow complete · use the recovery branch if a gate fails.';
+      return;
+    }
+    select(current + 1, false);
+    timer = window.setTimeout(advance, speed);
+  }
+  play.addEventListener('click', () => {
+    if (playing) { pause(); return; }
+    if (current >= steps.length - 1) select(-1, false);
+    playing = true;
+    play.textContent = 'Pause';
+    play.setAttribute('aria-pressed', 'true');
+    if (current < 0) select(0, false);
+    timer = window.setTimeout(advance, speed);
+  });
+  document.getElementById('restart').addEventListener('click', () => {
+    pause();
+    select(0, false);
+  });
+  document.getElementById('prev').addEventListener('click', () => select(Math.max(0, current - 1), true));
+  document.getElementById('next').addEventListener('click', () => select(Math.min(steps.length - 1, current + 1), true));
+  document.getElementById('speed').addEventListener('change', (event) => { speed = Number(event.target.value); });
+  document.getElementById('rollback').addEventListener('click', () => {
+    pause();
+    detail.kind.textContent = 'Recovery';
+    detail.kind.style.background = 'var(--red)';
+    detail.title.textContent = 'Failure: restore or forward-fix';
+    detail.ids.textContent = 'DEP-09 · DEP-10 · DEP-11 · NFR-OPS-07';
+    detail.body.replaceChildren();
+    const p = document.createElement('p');
+    p.textContent = 'A migration, seed or smoke-test failure must block promotion. Use a database-specific recovery plan: restore the validated pre-deploy backup or apply a reviewed forward fix.';
+    const q = document.createElement('p');
+    q.className = 'notice';
+    q.textContent = 'Application rollback alone may not reverse schema changes. Use backward-compatible expand/contract migrations or a tested restore/forward-fix plan.';
+    detail.body.append(p, q);
+  });
+  document.addEventListener('keydown', (event) => {
+    if (event.target instanceof HTMLInputElement || event.target instanceof HTMLSelectElement || event.target instanceof HTMLTextAreaElement) return;
+    if (event.key === 'ArrowRight') { event.preventDefault(); select(Math.min(steps.length - 1, current + 1), true); }
+    if (event.key === 'ArrowLeft') { event.preventDefault(); select(Math.max(0, current - 1), true); }
+  });
+  const theme = document.getElementById('theme');
+  theme.addEventListener('click', () => {
+    const dark = document.documentElement.getAttribute('data-theme') !== 'dark';
+    document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
+    theme.setAttribute('aria-pressed', String(dark));
+  });
+  if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    status.textContent = 'Reduced motion is enabled · use Next or select a step to explore.';
+  }
+})();
+</script>
+</body>
+</html>

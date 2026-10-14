@@ -26,13 +26,19 @@ npm start                          # http://localhost:3000  (seeds demo cases RA
 
 Sign in by choosing a role tile (simulation mode, no password): **Pat Owner** (Product Owner), **Kim Analyst** (FCRM Analyst), **Lee Committee** (Risk Committee), **Raj Admin** (FCRM Administrator).
 
+## API testing
+
+In VS Code, click the **Swagger** task button or run **FinSentinel: Swagger API tester** from the Task menu. It starts the API in watch mode and opens `http://localhost:3000/docs`; the OpenAPI JSON is at `/docs/json`. In Swagger UI, call `POST /api/auth/login` first to establish the session cookie before trying protected endpoints. API documentation is available outside production only.
+
 ## Verify
 
 ```powershell
 npm test            # 102 tests: unit, integration, security, adversarial (Playwright, no browser)
 npm run eval        # golden-dataset evaluation → evaluations/results/<timestamp>.json
 npm run gate        # release gate: software + AI + governance gates → PASS/FAIL
-npm run test:e2e    # Chromium walkthrough in light and dark themes (npx playwright install chromium first)
+npm run test:e2e    # Chromium E2E in light and dark; archives timestamped HTML + JSON reports
+npm run test:e2e:report          # Open the latest saved report in a browser
+npm run test:e2e:report -- --list # List saved runs; pass a run ID to open an older report
 ```
 
 ## Deploy (Stage 05)

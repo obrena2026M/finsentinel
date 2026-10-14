@@ -7,8 +7,10 @@ import multipart from '@fastify/multipart';
 import rateLimit from '@fastify/rate-limit';
 import session from '@fastify/session';
 import fastifyStatic from '@fastify/static';
+import swagger from '@fastify/swagger';
+import swaggerUi from '@fastify/swagger-ui';
 import Fastify, { type FastifyBaseLogger, type FastifyInstance } from 'fastify';
-import { serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
+import { jsonSchemaTransform, serializerCompiler, validatorCompiler } from 'fastify-type-provider-zod';
 import { AuthorizationError } from './domain/rbac.ts';
 import { RiskEngineError } from './domain/risk-engine.ts';
 import { RiskModelValidationError } from './domain/risk-model-schema.ts';
@@ -77,6 +79,24 @@ export async function buildApp(ctx: AppContext): Promise<FastifyInstance> {
       .send({ error: 'internal', message: 'internal error', correlation_id: correlationId });
   });
 
+  if (ctx.env.NODE_ENV !== 'production') {
+    await app.register(swagger, {
+      openapi: {
+        info: {
+          title: 'FinSentinel API',
+          description:
+            'Interactive API reference for local development and testing. Authenticate with POST /api/auth/login; the API uses a session cookie.',
+          version: '0.1.0',
+        },
+      },
+      transform: jsonSchemaTransform,
+    });
+    await app.register(swaggerUi, {
+      routePrefix: '/docs',
+      uiConfig: { docExpansion: 'list', deepLinking: true, persistAuthorization: true },
+    });
+  }
+
   await authRoutes(app, ctx);
   await caseRoutes(app, ctx);
   await systemRoutes(app, ctx);
@@ -84,6 +104,10 @@ export async function buildApp(ctx: AppContext): Promise<FastifyInstance> {
   if (existsSync(join(WEB_DIST, 'index.html'))) {
     await app.register(fastifyStatic, { root: WEB_DIST, prefix: '/', wildcard: false });
     app.setNotFoundHandler((request, reply) => {
+      if (ctx.env.NODE_ENV === 'production' && (request.url === '/docs' || request.url.startsWith('/docs/')))
+        return reply
+          .code(404)
+          .send({ error: 'not_found', message: 'API documentation is disabled in production' });
       if (request.method === 'GET' && !request.url.startsWith('/api') && !request.url.startsWith('/health'))
         return reply.sendFile('index.html');
       return reply

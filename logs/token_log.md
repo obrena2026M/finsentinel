@@ -33,6 +33,14 @@ Regenerate a session total with `scripts/token_report.ps1`.
 | 23 | 2026-09-30 | 1469b867 | User manual to PDF: `scripts/manual/pdf.ts` (marked → HTML → Playwright Chromium `page.pdf`, A4, header/footer with page numbers, section-per-page CSS), `npm run manual:pdf`, `documents/STAGE04_User_Manual.pdf` (34 pages, 41 images, 3.2 MB), docs updated | 36 | 1,068 | 44,893 | 6,216,604 | 608,325 | Added `marked` (pure JS) as the only new dev dependency. First render failed because about:blank cannot load file:// images; fixed by writing a temp HTML next to the manual. Verified with pdf-lib/pdf-parse (no PDF renderer on the machine). |
 | 24 | 2026-10-01 | f99b49d0 | STAGE05 - Deployment: plan reviewed with the user (target, GitHub plan, go-live gateway, first commit), production hardening (`HOST`, `TRUST_PROXY`, `COOKIE_SECURE`, `CORS_ORIGIN`, strict env flags, production seed guard, `BUILD_SHA`), `release.yml` (reuses `ci.yml`, zip + SBOM + Release, staging → approval → production), `deploy.ps1` (immutable releases, backup, Task Scheduler, smoke, auto-rollback), `smoke.ts`, `restore.ts`, Dockerfile, Dependabot, CodeQL, `STAGE05_Deployment.md`, animated `STAGE05_Deployment_Workflow.html`, criteria log, initial git commits on `main` | 131 | 3,892 | 273,796 | 20,100,273 | 573,452 | Three real staging deploy runs on the dev machine found two defects (env check before `npm ci`; orphaned server passing the smoke test for a crashed release) and a latent bug (`z.coerce.boolean` parses "0" as true). 102 non-browser + 10 e2e tests green. No sub-agents. |
 | 25 | 2026-10-13 | Copilot | STAGE03 - Interactive requirement-change workflow simulator (`documents/STAGE03_Requirement_Change_Workflow_Prototype.html`) | n/a | n/a | n/a | n/a | n/a | `token_report.ps1` reads Claude Code transcripts only and returned no current Copilot session data; delta unavailable. |
+| 26 | 2026-10-13 | Copilot | STAGE04 - Added ten browser E2E regression cases in `tests/e2e/app-regression.spec.ts` | n/a | n/a | n/a | n/a | n/a | 20 new executions passed across light/dark; full browser suite 30/30 passed. `token_report.ps1` does not include Copilot session usage. |
+| 27 | 2026-10-13 | Copilot | STAGE04 - Archive timestamped E2E HTML/JSON reports and add latest/selected report viewer commands | n/a | n/a | n/a | n/a | n/a | E2E 30/30 passed; report archived under `test-reports/e2e/20261013T193532661Z/`. Reporter cannot measure Copilot session usage. |
+| 28 | 2026-10-13 | Copilot | STAGE04 - Added VS Code End-to-End Testing task and latest saved report viewer button | n/a | n/a | n/a | n/a | n/a | Validated task/settings JSON and confirmed both task buttons reference existing tasks. Token reporter cannot measure Copilot session usage. |
+| 29 | 2026-10-14 | Copilot | STAGE05 - Database deployment and seeding workflow documentation (`documents/STAGE05_DB_Deployment_Workflow.md`) | n/a | n/a | n/a | n/a | n/a | `token_report.ps1` ran but only reads Claude Code transcripts, so this Copilot session's token delta is unavailable. |
+| 30 | 2026-10-14 | Copilot | STAGE05 - Interactive database deployment and seeding workflow (`documents/STAGE05_DB_Deployment_Workflow.html`) | n/a | n/a | n/a | n/a | n/a | Opened in browser and verified step selection, details panel, theme toggle and eight-step workflow. Token reporter cannot measure Copilot-session usage. |
+| 31 | 2026-10-14 | Copilot | STAGE03 - Swagger/OpenAPI API testing feasibility check | n/a | n/a | n/a | n/a | n/a | Confirmed Fastify + Zod route schemas make Swagger UI feasible; it is not currently registered. Token reporter cannot measure Copilot-session usage. |
+| 32 | 2026-10-14 | Copilot | Swagger UI launch instructions | n/a | n/a | n/a | n/a | n/a | Explained current API can be started but Swagger UI is not installed/registered yet. Token reporter cannot measure Copilot-session usage. |
+| 33 | 2026-10-14 | Copilot | STAGE03 - Install and integrate Swagger UI/OpenAPI, add production gating, tests and VS Code launch task | n/a | n/a | n/a | n/a | n/a | Focused integration tests 2/2 pass; typecheck and Biome pass; executed the VS Code task and verified `/docs` loaded with 37 API operations. `token_report.ps1` does not measure Copilot usage. |
 
 ## Cumulative totals
 
@@ -63,8 +71,16 @@ Regenerate a session total with `scripts/token_report.ps1`.
 | 23 | 924 | 25,321 | 4,457,165 | 255,146,429 | 33,008,902 |
 | 24 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
 | 25 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 26 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 27 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 28 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 29 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 30 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 31 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 32 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 33 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
 
-Task 25's Copilot-session usage is not included in these totals because the configured token reporter only reads Claude Code transcripts.
+Tasks 25–33 Copilot-session usage is not included in these totals because the configured token reporter only reads Claude Code transcripts.
 
 ## Column definitions
 

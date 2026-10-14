@@ -8,6 +8,7 @@ data/backups/
 test-results/
 playwright-report/
 playwright-report-e2e/
+test-reports/e2e/
 coverage/
 evaluations/results/*.json
 !evaluations/results/.gitkeep
