@@ -41,6 +41,8 @@ Regenerate a session total with `scripts/token_report.ps1`.
 | 31 | 2026-10-14 | Copilot | STAGE03 - Swagger/OpenAPI API testing feasibility check | n/a | n/a | n/a | n/a | n/a | Confirmed Fastify + Zod route schemas make Swagger UI feasible; it is not currently registered. Token reporter cannot measure Copilot-session usage. |
 | 32 | 2026-10-14 | Copilot | Swagger UI launch instructions | n/a | n/a | n/a | n/a | n/a | Explained current API can be started but Swagger UI is not installed/registered yet. Token reporter cannot measure Copilot-session usage. |
 | 33 | 2026-10-14 | Copilot | STAGE03 - Install and integrate Swagger UI/OpenAPI, add production gating, tests and VS Code launch task | n/a | n/a | n/a | n/a | n/a | Focused integration tests 2/2 pass; typecheck and Biome pass; executed the VS Code task and verified `/docs` loaded with 37 API operations. `token_report.ps1` does not measure Copilot usage. |
+| 34 | 2026-10-21 | Copilot | Cross-stage architecture demo script and animated presentation (`documents/PROJECT_ARCHITECTURE_DEMO.md`, `documents/PROJECT_ARCHITECTURE_DEMO.html`) | n/a | n/a | n/a | n/a | n/a | Browser-checked six slides, ten-step pipeline animation, keyboard navigation and paced controls. `token_report.ps1` ran but cannot measure Copilot-session usage. |
+| 35 | 2026-10-21 | Copilot | Stage 03 development-with-AI demo script and animated presentation v2 (`documents/PROJECT_ARCHITECTURE_DEMO_V2.md`, `documents/PROJECT_ARCHITECTURE_DEMO_V2.html`) | n/a | n/a | n/a | n/a | n/a | 455-word script (~3:03–3:22 at 135–150 wpm); browser-checked six slides, runtime pipeline animation and paced controls. `token_report.ps1` ran but cannot measure Copilot-session usage. |
 
 ## Cumulative totals
 
@@ -79,6 +81,8 @@ Regenerate a session total with `scripts/token_report.ps1`.
 | 31 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
 | 32 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
 | 33 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 34 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
+| 35 | 1,055 | 29,213 | 4,730,961 | 275,246,702 | 33,582,354 |
 
 Tasks 25–33 Copilot-session usage is not included in these totals because the configured token reporter only reads Claude Code transcripts.
 

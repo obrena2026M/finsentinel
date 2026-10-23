@@ -1,0 +1,661 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#07111f">
+  <title>FinSentinel — The Architecture Behind the Decision</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #07111f;
+      --panel: #101e30;
+      --panel-2: #14253a;
+      --ink: #f2f7ff;
+      --muted: #a5b7cc;
+      --line: #29405a;
+      --mint: #71f0c0;
+      --blue: #80aaff;
+      --violet: #c4a0ff;
+      --amber: #ffca72;
+      --rose: #ff8b9b;
+      --shadow: 0 24px 80px #0006;
+    }
+
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      min-width: 320px;
+      min-height: 100vh;
+      overflow: hidden;
+      color: var(--ink);
+      background:
+        radial-gradient(ellipse at 10% 10%, #153a4a88, transparent 34rem),
+        radial-gradient(ellipse at 88% 86%, #40245e66, transparent 36rem),
+        var(--bg);
+      font: 16px/1.5 Inter, ui-sans-serif, system-ui, "Segoe UI", sans-serif;
+    }
+
+    button { font: inherit; }
+    .app { width: 100%; height: 100vh; display: grid; grid-template-rows: auto 1fr auto; }
+    .topbar, .controls {
+      z-index: 3;
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 14px clamp(16px, 3vw, 44px);
+      background: #07111fc9;
+      backdrop-filter: blur(14px);
+    }
+    .topbar { border-bottom: 1px solid #ffffff12; }
+    .brand { font-weight: 850; letter-spacing: -.03em; }
+    .eyebrow, .stage-pill {
+      color: var(--mint);
+      font-size: .76rem;
+      font-weight: 800;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .spacer { flex: 1; }
+    .topbar .tagline { color: var(--muted); font-size: .88rem; }
+    .stage-pill {
+      padding: 5px 9px;
+      border: 1px solid #71f0c052;
+      border-radius: 999px;
+      letter-spacing: .07em;
+    }
+    .deck { position: relative; min-height: 0; }
+    .slide {
+      position: absolute;
+      inset: 0;
+      display: none;
+      overflow: auto;
+      align-items: center;
+      justify-content: center;
+      padding: clamp(22px, 4vh, 48px) clamp(18px, 6vw, 92px);
+    }
+    .slide.active { display: flex; animation: enter .65s cubic-bezier(.2,.8,.2,1) both; }
+    .content { width: min(1260px, 100%); }
+    h1, h2, h3, p { margin-top: 0; }
+    h1 {
+      max-width: 950px;
+      margin-bottom: 20px;
+      font-size: clamp(2.8rem, 7vw, 6.1rem);
+      line-height: .99;
+      letter-spacing: -.065em;
+    }
+    h2 {
+      margin-bottom: 12px;
+      font-size: clamp(2.1rem, 4vw, 3.7rem);
+      line-height: 1.06;
+      letter-spacing: -.05em;
+    }
+    h3 { margin-bottom: 8px; font-size: 1.15rem; }
+    p { color: var(--muted); }
+    .lead { max-width: 790px; font-size: clamp(1.12rem, 2vw, 1.48rem); }
+    .accent { color: var(--mint); }
+    .violet { color: var(--violet); }
+    .blue { color: var(--blue); }
+    .amber { color: var(--amber); }
+    .rose { color: var(--rose); }
+    .quote {
+      display: inline-block;
+      margin: 22px 0 0;
+      padding: 13px 18px;
+      border-left: 3px solid var(--mint);
+      background: linear-gradient(90deg, #71f0c018, transparent);
+      color: var(--ink);
+      font-size: clamp(1.12rem, 2.3vw, 1.7rem);
+      font-weight: 780;
+    }
+
+    .stages {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 8px;
+      margin-top: clamp(30px, 7vh, 76px);
+    }
+    .stage {
+      position: relative;
+      min-height: 80px;
+      padding: 12px 12px 10px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #ffffff06;
+    }
+    .stage b { display: block; color: var(--ink); font-size: .82rem; }
+    .stage span { color: var(--muted); font-size: .72rem; }
+    .stage .num { color: var(--mint); font-size: .7rem; font-weight: 850; letter-spacing: .08em; }
+    .stage.current { border-color: var(--mint); background: #71f0c016; box-shadow: 0 0 26px #71f0c01c; }
+
+    .grid { display: grid; gap: 14px; }
+    .system-grid { grid-template-columns: 1.1fr 1fr 1fr 1fr; align-items: stretch; margin-top: 28px; }
+    .card {
+      position: relative;
+      min-width: 0;
+      padding: 19px;
+      border: 1px solid var(--line);
+      border-radius: 17px;
+      background: linear-gradient(145deg, #14253ae8, #0d1a2ae8);
+      box-shadow: var(--shadow);
+    }
+    .card p { margin: 0; font-size: .94rem; }
+    .card-label {
+      display: block;
+      margin-bottom: 10px;
+      color: var(--muted);
+      font-size: .69rem;
+      font-weight: 850;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .actor-list { display: grid; gap: 8px; margin-top: 14px; }
+    .actor {
+      padding: 7px 9px;
+      border-radius: 9px;
+      background: #ffffff0b;
+      color: var(--ink);
+      font-size: .83rem;
+    }
+    .system-card { display: flex; flex-direction: column; justify-content: center; min-height: 180px; }
+    .system-card::after {
+      position: absolute;
+      top: 50%;
+      right: -19px;
+      width: 23px;
+      height: 2px;
+      background: var(--mint);
+      content: "";
+      z-index: 1;
+    }
+    .system-card:last-child::after { display: none; }
+    .system-card .glyph { margin-bottom: 14px; font-size: 1.6rem; }
+    .system-card strong { display: block; margin-bottom: 4px; font-size: 1.13rem; }
+    .footnote { margin-top: 14px; font-size: .84rem; }
+
+    .pipeline {
+      display: grid;
+      grid-template-columns: repeat(5, minmax(0, 1fr));
+      gap: 10px;
+      margin-top: 26px;
+      counter-reset: step;
+    }
+    .step {
+      position: relative;
+      min-height: 98px;
+      padding: 12px 12px 10px;
+      border: 1px solid var(--line);
+      border-radius: 13px;
+      background: #101e30d9;
+      transition: border-color .35s, transform .35s, background .35s, box-shadow .35s;
+      counter-increment: step;
+    }
+    .step::before {
+      display: block;
+      margin-bottom: 8px;
+      color: var(--muted);
+      content: "0" counter(step);
+      font-size: .68rem;
+      font-weight: 900;
+      letter-spacing: .12em;
+    }
+    .step strong { display: block; font-size: .89rem; }
+    .step small { display: block; margin-top: 4px; color: var(--muted); font-size: .72rem; line-height: 1.35; }
+    .step.active {
+      transform: translateY(-5px);
+      border-color: var(--violet);
+      background: #342759aa;
+      box-shadow: 0 0 28px #c4a0ff33;
+    }
+    .pipeline-caption {
+      display: flex;
+      justify-content: space-between;
+      margin-top: 14px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+    .ownership { grid-template-columns: repeat(3, minmax(0, 1fr)); margin-top: 28px; }
+    .ownership .card { min-height: 195px; }
+    .ownership .mark { font-size: 1.8rem; }
+    .ownership .card.ai { border-top: 3px solid var(--violet); }
+    .ownership .card.rules { border-top: 3px solid var(--mint); }
+    .ownership .card.people { border-top: 3px solid var(--blue); }
+    .guardrails {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 9px;
+      margin-top: 14px;
+    }
+    .guard {
+      padding: 11px 12px;
+      border: 1px solid var(--line);
+      border-radius: 12px;
+      color: var(--muted);
+      font-size: .79rem;
+    }
+    .guard b { display: block; margin-bottom: 3px; color: var(--ink); }
+
+    .release-flow {
+      display: grid;
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+      gap: 12px;
+      margin-top: 32px;
+    }
+    .release-step {
+      position: relative;
+      min-height: 158px;
+      padding: 16px 13px;
+      border: 1px solid var(--line);
+      border-radius: 15px;
+      background: #101e30e8;
+    }
+    .release-step:not(:last-child)::after {
+      position: absolute;
+      top: 25px;
+      right: -15px;
+      color: var(--mint);
+      content: "›";
+      font-size: 1.5rem;
+      font-weight: 900;
+      z-index: 1;
+    }
+    .release-step .n { color: var(--mint); font-size: .72rem; font-weight: 900; }
+    .release-step strong { display: block; margin: 11px 0 6px; font-size: .95rem; }
+    .release-step p { margin: 0; font-size: .77rem; }
+    .human-gate { border-color: #ffca7270; background: #ffca7210; }
+    .rollback { border-color: #ff8b9b70; }
+    .two-up { grid-template-columns: 1fr 1fr; margin-top: 18px; }
+    .metric-row { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .metric {
+      padding: 6px 9px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      color: var(--muted);
+      font-size: .74rem;
+    }
+    .close-layout { display: grid; grid-template-columns: 1.2fr .8fr; gap: 28px; align-items: center; }
+    .loop {
+      position: relative;
+      display: grid;
+      width: min(390px, 72vw);
+      aspect-ratio: 1;
+      margin: 0 auto;
+      place-items: center;
+      border: 1px solid #71f0c044;
+      border-radius: 50%;
+      background: radial-gradient(circle, #71f0c015, transparent 67%);
+    }
+    .loop::before, .loop::after {
+      position: absolute;
+      inset: 12%;
+      border: 1px dashed #71f0c066;
+      border-radius: 50%;
+      animation: orbit 22s linear infinite;
+      content: "";
+    }
+    .loop::after { inset: 24%; animation-duration: 15s; animation-direction: reverse; border-color: #c4a0ff70; }
+    .loop-core { z-index: 1; text-align: center; }
+    .loop-core strong { display: block; font-size: 1.25rem; }
+    .orbit-label {
+      position: absolute;
+      z-index: 2;
+      padding: 7px 10px;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      background: var(--panel);
+      font-size: .76rem;
+    }
+    .orbit-label.one { top: 4%; left: 50%; transform: translateX(-50%); }
+    .orbit-label.two { right: -2%; bottom: 25%; }
+    .orbit-label.three { bottom: 9%; left: 50%; transform: translateX(-50%); }
+    .orbit-label.four { top: 28%; left: -6%; }
+    .big-close { max-width: 690px; font-size: clamp(2.2rem, 5vw, 4.5rem); line-height: 1; letter-spacing: -.06em; }
+
+    .notes {
+      margin-top: 18px;
+      color: var(--muted);
+      font-size: .82rem;
+    }
+    .notes summary { width: fit-content; cursor: pointer; color: var(--blue); }
+    .notes p { max-width: 800px; margin: 8px 0 0; }
+    .controls { justify-content: space-between; border-top: 1px solid #ffffff12; }
+    .controls button {
+      padding: 8px 12px;
+      border: 1px solid var(--line);
+      border-radius: 10px;
+      background: var(--panel);
+      color: var(--ink);
+      cursor: pointer;
+    }
+    .controls button:hover, .controls button:focus-visible { border-color: var(--mint); outline: none; }
+    .controls .primary { border-color: #71f0c070; background: #71f0c019; color: var(--mint); font-weight: 800; }
+    .nav-center { display: flex; align-items: center; gap: 12px; }
+    .dots { display: flex; gap: 7px; }
+    .dot {
+      width: 9px;
+      height: 9px;
+      padding: 0;
+      border: 0 !important;
+      border-radius: 50% !important;
+      background: #75869c !important;
+    }
+    .dot.selected { transform: scale(1.3); background: var(--mint) !important; }
+    .counter { min-width: 58px; color: var(--muted); font-size: .84rem; text-align: center; }
+    .timer { position: absolute; inset: auto 0 0; height: 3px; background: #ffffff14; }
+    .timer-fill { width: 0; height: 100%; background: var(--mint); transform-origin: left; }
+    .timer-fill.running { animation: timer linear forwards; }
+    .sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); white-space: nowrap; border: 0; }
+
+    @keyframes enter { from { opacity: 0; transform: translateY(14px) scale(.992); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    @keyframes orbit { to { transform: rotate(360deg); } }
+    @keyframes timer { to { width: 100%; } }
+    @media (max-width: 850px) {
+      body { overflow: auto; }
+      .app { min-height: 100vh; height: auto; grid-template-rows: auto minmax(650px, 1fr) auto; }
+      .topbar .tagline { display: none; }
+      .slide { align-items: flex-start; padding: 28px 18px; }
+      .stages { grid-template-columns: repeat(3, 1fr); margin-top: 30px; }
+      .system-grid { grid-template-columns: repeat(2, 1fr); }
+      .system-card::after { display: none; }
+      .pipeline { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .step:last-child { grid-column: span 2; }
+      .ownership { grid-template-columns: 1fr; }
+      .ownership .card { min-height: auto; }
+      .guardrails { grid-template-columns: repeat(2, 1fr); }
+      .release-flow { grid-template-columns: repeat(2, 1fr); }
+      .release-step { min-height: 132px; }
+      .release-step::after { display: none; }
+      .close-layout { grid-template-columns: 1fr; }
+      .loop { width: min(300px, 72vw); }
+      .controls { position: sticky; bottom: 0; gap: 6px; padding: 10px; }
+      .controls button { padding: 7px 9px; font-size: .8rem; }
+      .nav-center { gap: 7px; }
+      .dots { gap: 5px; }
+    }
+    @media (max-width: 450px) {
+      .eyebrow { display: none; }
+      .system-grid, .two-up { grid-template-columns: 1fr; }
+      .stages { gap: 6px; }
+      .stage { min-height: 72px; padding: 8px; }
+      .stage b { font-size: .75rem; }
+      .stage span { font-size: .67rem; }
+      .nav-center .dots { display: none; }
+      .controls .primary { max-width: 108px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+    @media print {
+      body { overflow: visible; background: white; color: #111; }
+      .app { display: block; height: auto; }
+      .topbar, .controls, .timer { display: none; }
+      .slide { position: relative; display: flex !important; min-height: 95vh; color: #111; break-after: page; }
+      .card, .step, .release-step { box-shadow: none; background: #fff; }
+      p, .card p, .release-step p { color: #444; }
+    }
+  </style>
+</head>
+<body>
+  <div class="app">
+    <header class="topbar">
+      <span class="brand">FinSentinel</span>
+      <span class="stage-pill">Architecture demo</span>
+      <span class="eyebrow">A 2:25 guided story</span>
+      <span class="spacer"></span>
+      <span class="tagline">Synthetic data · AI-assisted · human governed</span>
+    </header>
+
+    <main class="deck" aria-label="FinSentinel architecture presentation">
+      <section class="slide active" aria-label="Slide 1: The architecture behind the decision">
+        <div class="content">
+          <span class="eyebrow">A financial-crime assessment, made reviewable</span>
+          <h1>The architecture<br>behind the <span class="accent">decision.</span></h1>
+          <p class="lead">FinSentinel turns change proposals and supporting documents into a traceable committee packet. It helps people decide; it never decides for them.</p>
+          <blockquote class="quote">AI prepares. Rules calculate. Humans decide.</blockquote>
+          <div class="stages" aria-label="Six-stage project arc">
+            <div class="stage"><span class="num">01</span><b>Understand</b><span>Requirements</span></div>
+            <div class="stage"><span class="num">02</span><b>Design</b><span>Boundaries</span></div>
+            <div class="stage"><span class="num">03</span><b>Build</b><span>Product</span></div>
+            <div class="stage"><span class="num">04</span><b>Prove</b><span>Quality</span></div>
+            <div class="stage"><span class="num">05</span><b>Release</b><span>Safe promotion</span></div>
+            <div class="stage"><span class="num">06</span><b>Operate</b><span>Learn & improve</span></div>
+          </div>
+          <details class="notes"><summary>Speaker notes · 0:00–0:20</summary><p>FinSentinel helps teams assess the financial-crime risk of a new product or change. The goal is not to let AI approve a launch. The goal is to turn scattered documents into a reviewable, evidence-backed assessment. Our design principle is simple: AI prepares. Rules calculate. Humans decide.</p></details>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Slide 2: Requirements shape the architecture">
+        <div class="content">
+          <span class="eyebrow">01 requirements → 02 design</span>
+          <h2>Define the boundaries<br><span class="blue">before building.</span></h2>
+          <p class="lead">A focused workbench, with one clear job: prepare evidence and recommendations for accountable human review.</p>
+          <div class="grid system-grid">
+            <article class="card system-card">
+              <span class="glyph blue">◉</span><span class="card-label">People · role-based</span>
+              <strong>Four distinct roles</strong>
+              <div class="actor-list"><span class="actor">Product Owner</span><span class="actor">FCRM Analyst</span><span class="actor">Risk Committee</span><span class="actor">FCRM Admin</span></div>
+            </article>
+            <article class="card system-card">
+              <span class="glyph violet">▤</span><span class="card-label">Presentation</span>
+              <strong>React workbench</strong><p>Cases, evidence, risk, committee packet and operations.</p>
+            </article>
+            <article class="card system-card">
+              <span class="glyph accent">⌘</span><span class="card-label">Application</span>
+              <strong>Fastify + Node</strong><p>Routes, services, fixed pipeline and domain rules.</p>
+            </article>
+            <article class="card system-card">
+              <span class="glyph amber">▦</span><span class="card-label">Persistence</span>
+              <strong>SQLite</strong><p>Case evidence, versions, calculations and audit history.</p>
+            </article>
+          </div>
+          <p class="footnote">One deployable process · one external runtime dependency: Anthropic API · fixture-backed mock gateway for repeatable demos and tests.</p>
+          <details class="notes"><summary>Speaker notes · 0:20–0:42</summary><p>We translated the brief into requirements, roles, safeguards and measurable acceptance criteria. The design is deliberately focused: one Node process, a React workbench, a Fastify API and SQLite. We chose a fixed workflow—not an autonomous agent loop—so each step, boundary and failure is visible.</p></details>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Slide 3: The evidence-focused assessment pipeline">
+        <div class="content">
+          <span class="eyebrow">03 development · fixed order, visible checkpoints</span>
+          <h2>Follow the evidence.<br><span class="violet">Not an agent loop.</span></h2>
+          <p class="lead">Each step has defined inputs and outputs. If an AI step fails, the case pauses for a human—it does not skip ahead to a decision.</p>
+          <div class="pipeline" id="pipeline">
+            <div class="step"><strong>Parse</strong><small>Documents become chunks</small></div>
+            <div class="step"><strong>Extract</strong><small>Facts keep their sources</small></div>
+            <div class="step"><strong>Reconcile</strong><small>Contradictions are surfaced</small></div>
+            <div class="step"><strong>Find gaps</strong><small>Missing information stays missing</small></div>
+            <div class="step"><strong>Scope</strong><small>Relevant risk dimensions</small></div>
+            <div class="step"><strong>Retrieve</strong><small>Policy via SQLite FTS5</small></div>
+            <div class="step"><strong>Assess</strong><small>Draft claims with citations</small></div>
+            <div class="step"><strong>Ground</strong><small>Verify quotes in evidence</small></div>
+            <div class="step"><strong>Calculate</strong><small>Deterministic risk engine</small></div>
+            <div class="step"><strong>Packet</strong><small>Prepare committee review</small></div>
+          </div>
+          <div class="pipeline-caption"><span>Structured facts → relevant policy → cited claims</span><span id="pipeline-status">Ready to trace</span></div>
+          <details class="notes"><summary>Speaker notes · 0:42–1:20</summary><p>When a case arrives, documents are parsed into source-linked facts. The pipeline extracts information, flags contradictions and missing details, scopes the relevant risk dimensions, and searches the policy library. AI drafts an assessment, but a grounding check verifies its citations against the evidence. Unsupported claims remain visible and block finalization. Then deterministic rules calculate inherent and residual risk: controls can reduce risk, never erase it. The result is a committee-ready packet, not an AI decision.</p></details>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Slide 4: Clear separation between AI, rules and people">
+        <div class="content">
+          <span class="eyebrow">Governance is part of the architecture</span>
+          <h2>Three responsibilities.<br><span class="accent">No blurred lines.</span></h2>
+          <div class="grid ownership">
+            <article class="card ai"><span class="mark violet">✦</span><span class="card-label">AI prepares</span><h3>Find and explain</h3><p>Extract facts, retrieve policy and draft evidence-linked recommendations. AI has no path to write a committee decision.</p></article>
+            <article class="card rules"><span class="mark accent">Σ</span><span class="card-label">Rules calculate</span><h3>Enforce and calculate</h3><p>Validate evidence, permissions, workflow guards and risk scores consistently. Controls mitigate risk; they never eliminate it.</p></article>
+            <article class="card people"><span class="mark blue">◎</span><span class="card-label">Humans decide</span><h3>Challenge and own</h3><p>Analysts clear blockers and explain changes. Only the Risk Committee records approve, defer or reject.</p></article>
+          </div>
+          <div class="guardrails">
+            <div class="guard"><b>Source-linked facts</b>No provenance, no invented value.</div>
+            <div class="guard"><b>Grounded claims</b>Unsupported claims block finalization.</div>
+            <div class="guard"><b>Rationale required</b>Material changes enter the history.</div>
+            <div class="guard"><b>Append-only audit</b>Events are protected by a hash chain.</div>
+          </div>
+          <details class="notes"><summary>Speaker notes · 1:20–1:48</summary><p>The analyst resolves contradictions, requests missing information and can override a recommendation—but must explain why. Only after blockers are cleared can the analyst send the case forward. The committee alone can approve, approve with conditions, defer or reject. Each material action is recorded in the case history.</p></details>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Slide 5: Testing and controlled deployment">
+        <div class="content">
+          <span class="eyebrow">04 testing → 05 deployment</span>
+          <h2>Prove it.<br><span class="amber">Promote it safely.</span></h2>
+          <p class="lead">Quality is checked across software behavior, AI output and governance. A release moves forward through explicit gates.</p>
+          <div class="release-flow">
+            <article class="release-step"><span class="n">01 · CHECK</span><strong>CI</strong><p>Lint, types, automated tests and build.</p></article>
+            <article class="release-step"><span class="n">02 · EVALUATE</span><strong>Quality gate</strong><p>Golden-set metrics and adversarial checks.</p></article>
+            <article class="release-step"><span class="n">03 · PACKAGE</span><strong>Versioned release</strong><p>Verified artifact, checksum and SBOM.</p></article>
+            <article class="release-step"><span class="n">04 · VERIFY</span><strong>Staging + smoke</strong><p>Prove the release is running correctly.</p></article>
+            <article class="release-step human-gate"><span class="n amber">05 · HUMAN GATE</span><strong>Production approval</strong><p>A named reviewer authorizes promotion.</p></article>
+            <article class="release-step rollback"><span class="n rose">06 · RECOVER</span><strong>Backup + rollback</strong><p>Smoke failure returns to the prior release.</p></article>
+          </div>
+          <div class="grid two-up">
+            <article class="card"><span class="card-label">Software confidence</span><h3>Unit · integration · security · adversarial · browser</h3><p>Automation tests deterministic rules; AI behavior is measured with evaluation data.</p></article>
+            <article class="card"><span class="card-label">Release confidence</span><h3>Same verified path, human-controlled</h3><p>Promotion is gated, observable and recoverable—not a one-way deploy.</p></article>
+          </div>
+          <details class="notes"><summary>Speaker notes · 1:48–2:12</summary><p>We test deterministic behavior with automated unit, integration, security and browser tests, and evaluate AI quality with a golden set and adversarial checks. Releases run through CI, staging and smoke tests. A human approves production; the database is backed up first, and a failed smoke test triggers rollback.</p></details>
+        </div>
+      </section>
+
+      <section class="slide" aria-label="Slide 6: Operations closes the loop">
+        <div class="content close-layout">
+          <div>
+            <span class="eyebrow">06 operations · the ongoing feedback loop</span>
+            <h2 class="big-close">Make every next assessment <span class="accent">more trustworthy.</span></h2>
+            <p class="lead">Watch health, AI quality, usage, cost, latency and case outcomes. Use what the evidence shows to guide controlled improvements to tests, policy, prompts and risk models.</p>
+            <div class="metric-row">
+              <span class="metric">Health & reliability</span><span class="metric">AI quality</span><span class="metric">Tokens & cost</span><span class="metric">Case outcomes</span><span class="metric">Versioned changes</span>
+            </div>
+            <p class="footnote">Stages 01–05 build and verify the workbench. Stage 06 is its ongoing operating phase.</p>
+            <blockquote class="quote">We make decisions easier to inspect—not easier to automate away.</blockquote>
+            <details class="notes"><summary>Speaker notes · 2:12–2:25</summary><p>Operations completes the loop: monitor system health, model usage, cost, latency and case outcomes; use quality and adversarial results to guide controlled improvements. The result is a system that makes decisions easier to inspect—not easier to automate away.</p></details>
+          </div>
+          <div class="loop" aria-label="Feedback loop: observe, evaluate, improve, verify">
+            <span class="orbit-label one">Observe</span><span class="orbit-label two">Evaluate</span>
+            <span class="orbit-label three">Improve</span><span class="orbit-label four">Verify</span>
+            <div class="loop-core"><strong>Operational<br>feedback</strong><span class="eyebrow">People stay accountable</span></div>
+          </div>
+        </div>
+      </section>
+      <div class="timer" aria-hidden="true"><div class="timer-fill" id="timer-fill"></div></div>
+      <p class="sr-only" id="announcement" aria-live="polite"></p>
+    </main>
+
+    <footer class="controls">
+      <button id="prev" aria-label="Previous slide">← Previous</button>
+      <div class="nav-center">
+        <div class="dots" id="dots" aria-label="Choose slide"></div>
+        <span class="counter" id="counter">01 / 06</span>
+      </div>
+      <button class="primary" id="play" aria-label="Start the 2 minute 25 second paced presentation">▶ Start 2:25 run</button>
+      <button id="next" aria-label="Next slide">Next →</button>
+    </footer>
+  </div>
+  <script>
+    (() => {
+      const slides = [...document.querySelectorAll(".slide")];
+      const dots = document.getElementById("dots");
+      const counter = document.getElementById("counter");
+      const play = document.getElementById("play");
+      const timerFill = document.getElementById("timer-fill");
+      const announcement = document.getElementById("announcement");
+      const pipelineSteps = [...document.querySelectorAll(".step")];
+      const pipelineStatus = document.getElementById("pipeline-status");
+      let current = 0;
+      let running = false;
+      let advanceTimer;
+      let pipelineTimer;
+      const slideSeconds = [20, 22, 38, 28, 24, 13];
+
+      slides.forEach((slide, index) => {
+        const dot = document.createElement("button");
+        dot.className = "dot";
+        dot.type = "button";
+        dot.setAttribute("aria-label", `Go to slide ${index + 1}`);
+        dot.addEventListener("click", () => show(index));
+        dots.append(dot);
+      });
+      const dotButtons = [...dots.children];
+
+      function stopTimers() {
+        clearTimeout(advanceTimer);
+        clearInterval(pipelineTimer);
+        pipelineSteps.forEach(step => step.classList.remove("active"));
+      }
+
+      function show(index) {
+        stopTimers();
+        current = Math.max(0, Math.min(slides.length - 1, index));
+        slides.forEach((slide, i) => {
+          slide.classList.toggle("active", i === current);
+          slide.setAttribute("aria-hidden", String(i !== current));
+        });
+        dotButtons.forEach((dot, i) => {
+          dot.classList.toggle("selected", i === current);
+          dot.setAttribute("aria-current", i === current ? "step" : "false");
+        });
+        counter.textContent = `${String(current + 1).padStart(2, "0")} / ${String(slides.length).padStart(2, "0")}`;
+        announcement.textContent = `Slide ${current + 1} of ${slides.length}`;
+        document.querySelectorAll(".stage").forEach((stage, i) => stage.classList.toggle("current", i === current));
+        timerFill.classList.remove("running");
+        timerFill.style.width = "0";
+        if (current === 2) tracePipeline();
+        if (running) {
+          timerFill.style.animationDuration = `${slideSeconds[current]}s`;
+          requestAnimationFrame(() => timerFill.classList.add("running"));
+          advanceTimer = setTimeout(() => {
+            if (current === slides.length - 1) {
+              running = false;
+              stopTimers();
+              timerFill.classList.remove("running");
+              timerFill.style.width = "100%";
+              play.textContent = "↻ Replay 2:25 run";
+              play.setAttribute("aria-label", "Replay the paced presentation");
+              return;
+            }
+            show(current + 1);
+          }, slideSeconds[current] * 1000);
+        }
+      }
+
+      function tracePipeline() {
+        let i = 0;
+        pipelineStatus.textContent = "Tracing the fixed sequence…";
+        pipelineTimer = setInterval(() => {
+          pipelineSteps.forEach((step, n) => step.classList.toggle("active", n === i));
+          pipelineStatus.textContent = `${String(i + 1).padStart(2, "0")} / 10 · ${pipelineSteps[i].querySelector("strong").textContent}`;
+          i = (i + 1) % pipelineSteps.length;
+        }, 850);
+      }
+
+      function toggleRun() {
+        if (running) {
+          running = false;
+          stopTimers();
+          play.textContent = "▶ Resume run";
+          play.setAttribute("aria-label", "Resume the paced presentation");
+          timerFill.classList.remove("running");
+          return;
+        }
+        if (current === slides.length - 1) show(0);
+        running = true;
+        play.textContent = "Ⅱ Pause run";
+        play.setAttribute("aria-label", "Pause the paced presentation");
+        show(current);
+      }
+
+      document.getElementById("prev").addEventListener("click", () => { running = false; show(current - 1); play.textContent = "▶ Start 2:25 run"; });
+      document.getElementById("next").addEventListener("click", () => { running = false; show(current + 1); play.textContent = "▶ Start 2:25 run"; });
+      play.addEventListener("click", toggleRun);
+      document.addEventListener("keydown", event => {
+        if (event.target.closest("input, textarea, select, [contenteditable=true]")) return;
+        if (event.key === " " && event.target.closest("button, summary")) return;
+        if (event.key === "ArrowRight" || event.key === "PageDown") { running = false; show(current + 1); play.textContent = "▶ Start 2:25 run"; }
+        if (event.key === "ArrowLeft" || event.key === "PageUp") { running = false; show(current - 1); play.textContent = "▶ Start 2:25 run"; }
+        if (event.key === "Home") { running = false; show(0); play.textContent = "▶ Start 2:25 run"; }
+        if (event.key === "End") { running = false; show(slides.length - 1); play.textContent = "▶ Start 2:25 run"; }
+        if (event.key === " " && !event.target.closest("details")) { event.preventDefault(); toggleRun(); }
+      });
+      show(0);
+    })();
+  </script>
+</body>
+</html>
